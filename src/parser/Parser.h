@@ -21,6 +21,7 @@ private:
 	std::unique_ptr<ASTExpression> parsePrimary();
 
 	std::unique_ptr<ASTFunctionPrototype> parsePrototype();
+	std::vector<std::unique_ptr<ASTArgument>> parseArguments();
 
 	std::unique_ptr<Lexer> Lexer;
 	std::vector<std::unique_ptr<ASTNode>> ASTRoot;
