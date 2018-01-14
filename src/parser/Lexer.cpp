@@ -1,4 +1,5 @@
 #include "Lexer.h"
+#include <iostream>
 
 Lexer::Lexer(std::istream& reader): reader(reader), LastChar(' '), CurToken(), NumValue(0), BoolValue(false), DtValue(), BinValue() {
 }

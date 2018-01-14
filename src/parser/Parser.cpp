@@ -6,6 +6,8 @@ Parser::Parser(std::istream& input) {
 }
 
 void Parser::parse() {
+	LogDebug("Parsing started.");
+
 	// read first token
 	Lexer->readNextToken();
 
@@ -13,17 +15,22 @@ void Parser::parse() {
 		switch (Lexer->getCurToken()) {
 			// TODO more tokens
 		case TokenType::KW_SEMICOLON:
+			LogDebug("Found stray ';', skipping.");
 			Lexer->readNextToken();
 			break;
-		case TokenType::KW_DEF: 
+		case TokenType::KW_DEF:
+			LogDebug("Function definition found.");
 			handleFunction();
 			break;
-		case TokenType::EOFTOK: 
+		case TokenType::EOFTOK:
+			LogDebug("EOF encountered.");
 			return;
-		case TokenType::INVALID_TOK: 
-			// TODO error
-			break;
-		default: 
+		case TokenType::INVALID_TOK:
+			LogDebug("Invalid token found.");
+			LogParsingError("Invalid token encountered.");
+			return;
+		default:
+			LogDebug("Parsing top level expression.");
 			handleTopLevelExpression();
 			break;
 		}
