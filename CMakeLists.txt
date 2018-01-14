@@ -7,3 +7,4 @@ add_executable(beplus "")
 
 include(src/CMakeLists.txt)
 include(src/parser/CMakeLists.txt)
+include(src/parser/ast/CMakeLists.txt)

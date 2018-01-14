@@ -48,7 +48,7 @@ enum class BinOp {
 
 class Lexer {
 public:
-	Lexer(std::istream& reader);
+	explicit Lexer(std::istream& reader);
 	TokenType readNextToken();
 
 	TokenType getCurToken() const;
