@@ -76,12 +76,11 @@ void Parser::handleFunction() {
 std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
 	LogDebug("Parsing function prototype");
 
-	std::string name = Lexer->getStrValue();
+	auto name = Lexer->getStrValue();
 	Lexer->readNextToken(); // eat identifier
 
 	if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET)
 		throw ParserException("Expected '('");
-
 	Lexer->readNextToken(); // eat '('
 
 	auto args = parseArguments();
