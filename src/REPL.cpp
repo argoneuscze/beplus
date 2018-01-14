@@ -1,8 +1,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
-#include "parser/Parser.h"
 #include <sstream>
+
+#include "parser/Parser.h"
 
 void startREPL() {
 	while (true) {

@@ -8,6 +8,20 @@
 #include "ast/ASTExpression.h"
 #include "ast/ASTFunctionPrototype.h"
 
+class ParserException : std::exception {
+public:
+	explicit ParserException(const char* msg) {
+		this->msg = msg;
+	}
+
+	char const* what() const override {
+		return msg;
+	}
+
+private:
+	const char* msg;
+};
+
 class Parser {
 public:
 	explicit Parser(std::istream& input);

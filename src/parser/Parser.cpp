@@ -1,7 +1,7 @@
 #include "Parser.h"
 #include "Util.cpp"
+
 #include "ast/ASTArgument.h"
-#include "ParserException.cpp"
 
 Parser::Parser(std::istream& input) {
 	Lexer = std::make_unique<::Lexer>(input);
