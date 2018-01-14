@@ -11,10 +11,14 @@ The project is packaged using CMake, so it should be compilable on every major p
 * Clone this repository
 * Create another directory for building (e.g. `mkdir build` in the project directory)
 * Run CMake (`cmake ..`)
-* Run the resulting makefile (`make`)
+* Run the resulting Makefile (`make`)
 * Run the Beplus interpreter (`./beplus`)
 
 ## Usage
 
 You may either run the interpreter in REPL mode, or you can supply a filename as an argument.
 This file will then be parsed and ran with the interpreter.
+
+## License
+
+TBA
