@@ -12,7 +12,7 @@ void LogDebug(const char* msg) {
 		fprintf(stdout, "DEBUG: %s\n", msg);
 }
 
-void LogDebug(ASTNode* node) {
+void LogDebug(const ASTNode* node) {
 	if (IS_DEBUG)
 		std::cout << "DEBUG: " << *node << std::endl;
 }
