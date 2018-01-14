@@ -117,6 +117,8 @@ TokenType Lexer::getTok() {
 	case '/':
 		BinValue = BinOp::OP_DIV;
 		return TokenType::KW_BINARYOP;
+	default: 
+		break;
 	}
 
 	return TokenType::INVALID_TOK;
