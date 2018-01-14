@@ -1,50 +1,54 @@
 #include "Parser.h"
 #include "Util.cpp"
 #include "ast/ASTArgument.h"
+#include "ParserException.cpp"
 
 Parser::Parser(std::istream& input) {
 	Lexer = std::make_unique<::Lexer>(input);
 }
 
 void Parser::parse() {
-	LogDebug("Parsing started.");
+	LogDebug("Parsing started");
 
 	// read first token
 	Lexer->readNextToken();
 
-	while (true) {
-		switch (Lexer->getCurToken()) {
-			// TODO more tokens
-		case TokenType::KW_SEMICOLON:
-			LogDebug("Found stray ';', skipping.");
-			Lexer->readNextToken();
-			break;
-		case TokenType::KW_DEF:
-			LogDebug("Function definition found.");
-			handleFunction();
-			break;
-		case TokenType::EOFTOK:
-			LogDebug("EOF encountered.");
-			return;
-		case TokenType::INVALID_TOK:
-			LogDebug("Invalid token found.");
-			LogParsingError("Invalid token encountered.");
-			return;
-		default:
-			LogDebug("Parsing top level expression.");
-			handleTopLevelExpression();
-			break;
+	try {
+		while (true) {
+			switch (Lexer->getCurToken()) {
+				// TODO more tokens
+			case TokenType::KW_SEMICOLON:
+				LogDebug("Found stray ';', skipping");
+				Lexer->readNextToken();
+				break;
+			case TokenType::KW_DEF:
+				LogDebug("Function definition found");
+				handleFunction();
+				break;
+			case TokenType::EOFTOK:
+				LogDebug("EOF encountered");
+				return;
+			case TokenType::INVALID_TOK:
+				LogDebug("Invalid token found");
+				throw ParserException("Invalid token found");
+				return;
+			default:
+				LogDebug("Parsing top level expression");
+				handleTopLevelExpression();
+				break;
+			}
 		}
+	}
+	catch (ParserException& ex) {
+		LogParsingError(ex.what());
 	}
 }
 
 void Parser::handleTopLevelExpression() {
 	auto expr = parseExpression();
 
-	if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-		LogParsingError("Expected a ';' at the end of an expression.");
-		return;
-	}
+	if (Lexer->getCurToken() != TokenType::KW_SEMICOLON)
+		throw ParserException("Expected a ';' at the end of an expression");
 
 	ASTRoot.push_back(std::move(expr));
 }
@@ -64,70 +68,62 @@ void Parser::handleFunction() {
 	Lexer->readNextToken(); // eat def
 
 	auto proto = parsePrototype();
-	if (!proto)
-		exit(-1); // TODO better errors
 
+	// TODO parse the rest of the function
 }
 
 // prototype ::= identifier '(' arguments ')' ':' datatype
 std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
+	LogDebug("Parsing function prototype");
+
 	std::string name = Lexer->getStrValue();
 	Lexer->readNextToken(); // eat identifier
 
-	if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
-		LogParsingError("Expected '('.");
-		return nullptr;
-	}
+	if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET)
+		throw ParserException("Expected '('");
+
 	Lexer->readNextToken(); // eat '('
 
 	auto args = parseArguments();
-	// TODO check if there were errors
 	Lexer->readNextToken(); // eat ')'
 
-	if (Lexer->getCurToken() != TokenType::KW_COLON) {
-		LogParsingError("Expected ':'.");
-		return nullptr;
-	}
+	if (Lexer->getCurToken() != TokenType::KW_COLON)
+		throw ParserException("Expected ':'");
 	Lexer->readNextToken(); // eat ':'
 
-	if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
-		LogParsingError("Expected datatype.");
-		return nullptr;
-	}
-	DataType type = Lexer->getDataType();
+	if (Lexer->getCurToken() != TokenType::KW_DATATYPE)
+		throw ParserException("Expected datatype");
+	auto type = Lexer->getDataType();
 	Lexer->readNextToken(); // eat datatype
 
+	throw ParserException("Not implemented yet");
 	// TODO make arguments
 	//return std::make_unique<ASTFunctionPrototype>()
 }
 
 // arguments ::= datatype identifier ',' | ')'
 std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
+	LogDebug("Parsing prototype arguments");
+
 	std::vector<std::unique_ptr<ASTArgument>> args;
 
 	if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET)
 		return args;
 
 	while (true) {
-		if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
-			LogParsingError("Expected datatype.");
-			// need to return here
-			// TODO better error handling...
-			exit(-1);
-		}
+		if (Lexer->getCurToken() != TokenType::KW_DATATYPE)
+			throw ParserException("Expected datatype");
 		auto type = Lexer->getDataType();
 		Lexer->readNextToken(); // eat datatype
 
-		if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
-			LogParsingError("Expected identifier.");
-			// need to return here
-			// TODO better error handling...
-			exit(-1);
-		}
+		if (Lexer->getCurToken() != TokenType::IDENTIFIER)
+			throw ParserException("Expected identifier");
 		auto ident = Lexer->getStrValue();
 		Lexer->readNextToken(); // eat identifier
 
-		args.push_back(std::make_unique<ASTArgument>(type, ident));
+		auto arg = std::make_unique<ASTArgument>(type, ident);
+		LogDebug(arg.get());
+		args.push_back(std::move(arg));
 
 		switch (Lexer->getCurToken()) {
 		case TokenType::KW_COMMA:
@@ -136,9 +132,7 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
 		case TokenType::KW_RIGHTBRACKET:
 			return args;
 		default:
-			exit(-1);
-			// TODO better error
-			break;
+			throw ParserException("Expected ',' or ')'");
 		}
 	}
 }
