@@ -1,0 +1,19 @@
+def main(): int
+{
+  bool myBool = true;
+  myBool = false;
+  myBool = 2; # Comment not to make it crash
+  myBool = 1; # ???
+
+  char myChar = 'a';
+  myChar = "asdf"; # Comment not to make it crash
+
+  int myInt = 5;
+  myInt = "asdfasdf"; # Comment not to make it crash
+
+  nonExistingType val = 5; # Comment not to make it crash
+
+  # More types - double? string?
+
+  return 0;
+}

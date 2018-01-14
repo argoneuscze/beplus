@@ -1,0 +1,17 @@
+def main(): int
+{
+  for(int i = 0; i < 5; i++)
+    print(i);  # No '{' '}' - should be ok with parser as the next thing is executed (be it a block or a statement)
+
+  for(int i = 0; i < 5; i++)
+  {
+    print(i);
+  }
+
+  int i = 0;
+  while(i < 5)
+  {
+    print(i);
+    i++;
+  }
+}

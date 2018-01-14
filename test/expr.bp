@@ -1,0 +1,11 @@
+def main(): int
+{
+  int in;
+  readInput(in);
+
+  int multiplier = 5;
+
+  print(multiplier * res);
+
+  return 0;
+}

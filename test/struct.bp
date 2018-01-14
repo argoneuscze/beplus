@@ -1,0 +1,17 @@
+struct myStruct
+{
+  int first;
+  int second;
+}
+
+def main(): int
+{
+  myStruct strct;
+  strct.first = 1;
+  strct.second = 2;
+
+  print(strct.first);
+  print(strct.second);
+
+  return 0;
+}

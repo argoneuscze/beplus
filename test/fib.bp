@@ -1,0 +1,18 @@
+def fib(int n): int
+{
+  if (n < 2)
+    return n;
+  if (n >= 2)
+    return fib(n-1) + fib(n-2);
+}
+
+def main(): int
+{
+  int in;
+
+  readInput(in);
+
+  print(fib(in));
+
+  return 0;
+}

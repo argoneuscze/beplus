@@ -1,0 +1,10 @@
+def main(): int
+{
+  print(10);
+
+  # This is a comment
+
+  print(10 * 20);
+
+  return 0;
+}
