@@ -5,6 +5,7 @@ class ASTArgument;
 
 class Visitor {
 public:
+	Visitor() = default;
 	virtual ~Visitor() = default;
 	Visitor(const Visitor& other) = default;
 	Visitor(Visitor&& other) noexcept = default;

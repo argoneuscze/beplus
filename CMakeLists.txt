@@ -6,5 +6,6 @@ set(CMAKE_CXX_STANDARD 11)
 add_executable(beplus "")
 
 include(src/CMakeLists.txt)
+include(src/simple_interpreter/CMakeLists.txt)
 include(src/parser/CMakeLists.txt)
 include(src/parser/ast/CMakeLists.txt)
