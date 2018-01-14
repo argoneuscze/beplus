@@ -1,5 +1,5 @@
-#include "parser.h"
-#include "util.cpp"
+#include "Parser.h"
+#include "Util.cpp"
 
 Parser::Parser(std::istream& input) {
 	Lexer = std::make_unique<::Lexer>(input);
