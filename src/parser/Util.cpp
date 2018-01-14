@@ -1,7 +1,7 @@
-#include <memory>
-#include <iostream>
+#include "Util.h"
 
-const bool IS_DEBUG = true;
+#include <cstdio>
+#include <iostream>
 
 void LogParsingError(const char* msg) {
 	fprintf(stderr, "Parsing Error: %s\n", msg);
