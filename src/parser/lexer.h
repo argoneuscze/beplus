@@ -2,7 +2,7 @@
 
 #include <string>
 
-enum class token_type {
+enum class TokenType {
 	// language keywords
 	KW_DEF,
 	KW_DATATYPE,
@@ -30,16 +30,16 @@ enum class token_type {
 	BOOL,
 
 	// other
-	EOFTOK
+	EOFTOK, INVALID_TOK
 };
 
-enum class data_type {
+enum class DataType {
 	DT_VOID,
 	DT_INT,
 	DT_CHAR
 };
 
-enum class bin_op {
+enum class BinOp {
 	OP_ADD,
 	OP_SUB,
 	OP_MUL,
@@ -48,8 +48,24 @@ enum class bin_op {
 
 class Lexer {
 public:
+	Lexer(std::istream& reader);
+	TokenType readNextToken();
+
+	TokenType getCurToken() const;
+	long getNumValue() const;
+	bool getBoolValue() const;
+	std::string getStrValue() const;
+	DataType getDataType() const;
+	BinOp getBinOp() const;
 private:
-	long num_value;
-	bool bool_value;
-	std::string str_value;
+	TokenType getTok();
+
+	std::istream& reader;
+	int LastChar;
+	TokenType CurToken;
+	long NumValue;
+	bool BoolValue;
+	std::string StrValue;
+	DataType DtValue;
+	BinOp BinValue;
 };
