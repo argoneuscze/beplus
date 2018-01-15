@@ -8,7 +8,7 @@
 class ASTArgument : public ASTNode {
 public:
     ASTArgument(const DataType DType, std::string Name) : DType(DType), Name(std::move(Name)) {
-    };
+    }
 
     void accept(Visitor* v) override {
         v->visit(this);

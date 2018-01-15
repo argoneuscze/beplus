@@ -4,6 +4,7 @@ class ASTFunction;
 class ASTArgument;
 class ASTExpressionBinOp;
 class ASTExpressionNumber;
+class ASTBlock;
 
 class Visitor {
 public:
@@ -18,4 +19,5 @@ public:
     virtual void visit(ASTArgument* arg) = 0;
     virtual void visit(ASTExpressionBinOp* arg) = 0;
     virtual void visit(ASTExpressionNumber* arg) = 0;
+    virtual void visit(ASTBlock* block) = 0;
 };

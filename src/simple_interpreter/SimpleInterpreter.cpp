@@ -4,6 +4,7 @@
 #include "../parser/ast/ASTFunction.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
 #include "../parser/ast/ASTExpressionNumber.h"
+#include "../parser/ast/ASTBlock.h"
 #include <iostream>
 
 SimpleInterpreter::SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>& rootNodes)
@@ -12,6 +13,7 @@ SimpleInterpreter::SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>
 }
 
 void SimpleInterpreter::visit(ASTFunction* func) {
+    std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTArgument* arg) {
@@ -52,6 +54,10 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
     ValueNum = num->getValue();
+}
+
+void SimpleInterpreter::visit(ASTBlock* block) {
+    std::cout << "Simple interpreter visiting a block" << std::endl;
 }
 
 void SimpleInterpreter::interpret() {

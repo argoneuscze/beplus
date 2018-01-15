@@ -7,6 +7,7 @@ Parser::Parser(std::istream& input) {
     Lexer = std::make_unique<::Lexer>(input);
 }
 
+// TODO Change parse() to return a Module
 std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
     std::string err; // have to declare before switch
     LogDebug("Parsing started");
@@ -143,8 +144,20 @@ void Parser::handleFunction() {
 
     auto proto = parsePrototype();
 
+    if (Lexer->getCurToken() != TokenType::KW_LEFTCURLYBRACKET) {
+        std::string err = "Expected '{', instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
+    Lexer->readNextToken(); // eat '{'
+
     // parse the following block
     auto block = parseBlock();
+
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
+        std::string err = "Expected '}', instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
+    Lexer->readNextToken(); // eat '}'
 }
 
 // prototype ::= identifier '(' arguments ')' ':' datatype
@@ -176,9 +189,10 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
     auto type = Lexer->getDataType();
     Lexer->readNextToken(); // eat datatype
 
-    throw ParserException("Not implemented yet");
-    // TODO make arguments
+    //throw ParserException("Function prototype: Not implemented yet");
+    // TODO make arguments - env etc
     //return std::make_unique<ASTFunctionPrototype>()
+    return nullptr;
 }
 
 // arguments ::= datatype identifier ',' | ')'
@@ -219,9 +233,21 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
     }
 }
 
-std::unique_ptr<ASTBlock>> Parser::parseBlock() {
-  throw ParserException("NOT IMPLEMENTED");
-  return nullptr;
+// block ::= statement*
+// ends with a '}' but eating '}' should be done by the function caller
+// TODO rename to handleBlock()
+std::unique_ptr<ASTBlock> Parser::parseBlock() {
+    // throw ParserException("parseBlock() NOT IMPLEMENTED");
+    auto block = std::make_unique<ASTBlock>();
+
+    while (true) {
+        if (Lexer->getCurToken() == TokenType::KW_RIGHTCURLYBRACKET)
+            return block;
+        // auto astnode = parseStatement();
+        // block.pushNode(astnode);
+    }
+
+    throw ParserException("parseBlock() should never get here");
 }
 
 BinOpPrecedence Parser::OpPrecedence = BinOpPrecedence();
