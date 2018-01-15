@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <string>
 
 #include "Lexer.h"
 
@@ -14,16 +15,18 @@
 
 class ParserException : std::exception {
 public:
-    explicit ParserException(const char* msg) {
+    //explicit ParserException(const char* msg) {
+    explicit ParserException(std::string msg) {
         this->msg = msg;
     }
 
-    char const* what() const override {
-        return msg;
+    char const* what() const noexcept override {
+        return msg.c_str();
     }
 
 private:
-    const char* msg;
+    //const char* msg;
+    std::string msg;
 };
 
 class BinOpPrecedence {

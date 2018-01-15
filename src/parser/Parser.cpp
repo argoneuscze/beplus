@@ -1,3 +1,4 @@
+#include <string> // string concat - error output
 #include "Parser.h"
 
 #include "Util.h"
@@ -7,6 +8,7 @@ Parser::Parser(std::istream& input) {
 }
 
 std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
+    std::string err; // have to declare before switch
     LogDebug("Parsing started");
 
     // read first token
@@ -28,8 +30,9 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
                 LogDebug("EOF encountered");
                 return std::move(ASTRoot);
             case TokenType::INVALID_TOK:
-                LogDebug("Invalid token found");
-                throw ParserException("Invalid token found");
+                // LogDebug("Invalid token found"); // no need to logdebug
+                err = "Invalid token found: " + Lexer->getStrValue();
+                throw ParserException(err);
             default:
                 LogDebug("Parsing top level expression");
                 handleTopLevelExpression();
@@ -49,8 +52,12 @@ void Parser::handleTopLevelExpression() {
 
     LogDebug(expr.get());
 
-    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON)
-        throw ParserException("Expected a ';' at the end of an expression");
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        std::string err = "Expected a ';' at the end of an expression, \
+instead got " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
+
     Lexer->readNextToken(); // eat ';'
 
     ASTRoot.push_back(std::move(expr));
@@ -78,7 +85,9 @@ std::unique_ptr<ASTExpression> Parser::parsePrimary() {
         return parseParenthesisExpression();
         // TODO more token types
     default:
-        throw ParserException("Unknown token found when parsing expression");
+        std::string err = "Unknown token " + Lexer->getStrValue() + " found \
+when parsing expression.";
+        throw ParserException(err);
     }
 }
 
@@ -119,8 +128,10 @@ std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
 
     auto expr = parseExpression();
 
-    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET)
-        throw ParserException("Expected ')'");
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
+        std::string err = "Expected ')', instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
     Lexer->readNextToken(); // eat ')'
 
     return expr;
@@ -132,7 +143,8 @@ void Parser::handleFunction() {
 
     auto proto = parsePrototype();
 
-    // TODO parse the rest of the function
+    // parse the following block
+    auto block = parseBlock();
 }
 
 // prototype ::= identifier '(' arguments ')' ':' datatype
@@ -142,19 +154,25 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
     auto name = Lexer->getStrValue();
     Lexer->readNextToken(); // eat identifier
 
-    if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET)
-        throw ParserException("Expected '('");
+    if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
+        std::string err = "Expected '(', instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
     Lexer->readNextToken(); // eat '('
 
     auto args = parseArguments();
     Lexer->readNextToken(); // eat ')'
 
-    if (Lexer->getCurToken() != TokenType::KW_COLON)
-        throw ParserException("Expected ':'");
+    if (Lexer->getCurToken() != TokenType::KW_COLON) {
+        std::string err = "Expected ':', instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
     Lexer->readNextToken(); // eat ':'
 
-    if (Lexer->getCurToken() != TokenType::KW_DATATYPE)
-        throw ParserException("Expected datatype");
+    if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
+        std::string err = "Expected datatype, instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    }
     auto type = Lexer->getDataType();
     Lexer->readNextToken(); // eat datatype
 
@@ -165,6 +183,7 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
 
 // arguments ::= datatype identifier ',' | ')'
 std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
+    std::string err;
     LogDebug("Parsing prototype arguments");
 
     std::vector<std::unique_ptr<ASTArgument>> args;
@@ -194,9 +213,15 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
         case TokenType::KW_RIGHTBRACKET:
             return args;
         default:
-            throw ParserException("Expected ',' or ')'");
+            err = "Expected ',' or ')', instead got: " + Lexer->getStrValue();
+            throw ParserException(err);
         }
     }
+}
+
+std::unique_ptr<ASTBlock>> Parser::parseBlock() {
+  throw ParserException("NOT IMPLEMENTED");
+  return nullptr;
 }
 
 BinOpPrecedence Parser::OpPrecedence = BinOpPrecedence();

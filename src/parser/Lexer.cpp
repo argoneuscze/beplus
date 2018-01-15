@@ -87,6 +87,8 @@ TokenType Lexer::getTok() {
         return TokenType::EOFTOK;
 
     auto ThisChar = LastChar;
+    StrValue.clear();
+    StrValue += ThisChar; // mostly for debug purposes
     LastChar = reader.get();
     switch (ThisChar) {
     case '(':
