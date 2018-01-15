@@ -46,20 +46,83 @@ void Parser::parse() {
 void Parser::handleTopLevelExpression() {
     auto expr = parseExpression();
 
+    LogDebug(expr.get());
+
     if (Lexer->getCurToken() != TokenType::KW_SEMICOLON)
         throw ParserException("Expected a ';' at the end of an expression");
+    Lexer->readNextToken(); // eat ';'
 
     ASTRoot.push_back(std::move(expr));
 }
 
+int Parser::getTokPrecedence() const {
+    if (Lexer->getCurToken() != TokenType::KW_BINARYOP)
+        return -1;
+    return OpPrecedence.get(Lexer->getBinOp());
+}
+
 std::unique_ptr<ASTExpression> Parser::parseExpression() {
-    // TODO
-    return nullptr;
+    LogDebug("Parsing expression");
+
+    auto primary = parsePrimary();
+
+    return parseBinOpRHS(0, std::move(primary));
 }
 
 std::unique_ptr<ASTExpression> Parser::parsePrimary() {
-    // TODO
-    return nullptr;
+    switch (Lexer->getCurToken()) {
+    case TokenType::NUMBER:
+        return parseNumberExpression();
+    case TokenType::KW_LEFTBRACKET:
+        return parseParenthesisExpression();
+        // TODO more token types
+    default:
+        throw ParserException("Unknown token found when parsing expression");
+    }
+}
+
+std::unique_ptr<ASTExpression> Parser::parseBinOpRHS(const int prec, std::unique_ptr<ASTExpression> LHS) {
+    LogDebug("Parsing binary operation");
+
+    while (true) {
+        auto tokPrec = getTokPrecedence();
+
+        if (tokPrec < prec)
+            return LHS;
+
+        auto binOp = Lexer->getBinOp();
+        Lexer->readNextToken(); // eat BinOp
+
+        auto RHS = parsePrimary();
+
+        auto nextPrec = getTokPrecedence();
+        if (tokPrec < nextPrec)
+            RHS = parseBinOpRHS(tokPrec + 1, std::move(RHS));
+
+        LHS = std::make_unique<ASTExpressionBinOp>(std::move(LHS), std::move(RHS), binOp);
+    }
+}
+
+std::unique_ptr<ASTExpressionNumber> Parser::parseNumberExpression() {
+    LogDebug("Parsing number");
+
+    auto num = std::make_unique<ASTExpressionNumber>(Lexer->getNumValue());
+    Lexer->readNextToken(); // eat number
+    return num;
+}
+
+std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
+    LogDebug("Parsing a parenthesis expression");
+
+    Lexer->readNextToken(); // eat '('
+
+    auto expr = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET)
+        throw ParserException("Expected ')'");
+    Lexer->readNextToken(); // eat ')'
+
+    return expr;
 }
 
 // function ::= 'def' prototype '{' statement* '}'
@@ -134,3 +197,5 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
         }
     }
 }
+
+BinOpPrecedence Parser::OpPrecedence = BinOpPrecedence();
