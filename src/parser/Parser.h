@@ -11,33 +11,33 @@
 
 class ParserException : std::exception {
 public:
-	explicit ParserException(const char* msg) {
-		this->msg = msg;
-	}
+    explicit ParserException(const char* msg) {
+        this->msg = msg;
+    }
 
-	char const* what() const override {
-		return msg;
-	}
+    char const* what() const override {
+        return msg;
+    }
 
 private:
-	const char* msg;
+    const char* msg;
 };
 
 class Parser {
 public:
-	explicit Parser(std::istream& input);
+    explicit Parser(std::istream& input);
 
-	void parse();
+    void parse();
 private:
-	void handleTopLevelExpression();
-	void handleFunction();
+    void handleTopLevelExpression();
+    void handleFunction();
 
-	std::unique_ptr<ASTExpression> parseExpression();
-	std::unique_ptr<ASTExpression> parsePrimary();
+    std::unique_ptr<ASTExpression> parseExpression();
+    std::unique_ptr<ASTExpression> parsePrimary();
 
-	std::unique_ptr<ASTFunctionPrototype> parsePrototype();
-	std::vector<std::unique_ptr<ASTArgument>> parseArguments();
+    std::unique_ptr<ASTFunctionPrototype> parsePrototype();
+    std::vector<std::unique_ptr<ASTArgument>> parseArguments();
 
-	std::unique_ptr<Lexer> Lexer;
-	std::vector<std::unique_ptr<ASTNode>> ASTRoot;
+    std::unique_ptr<Lexer> Lexer;
+    std::vector<std::unique_ptr<ASTNode>> ASTRoot;
 };

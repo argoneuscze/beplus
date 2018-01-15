@@ -2,6 +2,6 @@
 
 #include "ASTNode.h";
 
-class ASTFunction: public ASTNode {
-	
+class ASTFunction : public ASTNode {
+
 };

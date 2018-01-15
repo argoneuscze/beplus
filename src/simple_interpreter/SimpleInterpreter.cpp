@@ -3,10 +3,10 @@
 #include "../parser/ast/ASTArgument.h"
 
 void SimpleInterpreter::visit(ASTFunction* func) {
-	// TODO
+    // TODO
 }
 
 void SimpleInterpreter::visit(ASTArgument* arg) {
-	// TODO
-	arg->accept(this);
+    // TODO
+    arg->accept(this);
 }

@@ -4,6 +4,6 @@
 
 class SimpleInterpreter : public Visitor {
 public:
-	void visit(ASTFunction* func) override;
-	void visit(ASTArgument* arg) override;
+    void visit(ASTFunction* func) override;
+    void visit(ASTArgument* arg) override;
 };
