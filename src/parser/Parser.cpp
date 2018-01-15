@@ -6,7 +6,7 @@ Parser::Parser(std::istream& input) {
     Lexer = std::make_unique<::Lexer>(input);
 }
 
-void Parser::parse() {
+std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
     LogDebug("Parsing started");
 
     // read first token
@@ -26,11 +26,10 @@ void Parser::parse() {
                 break;
             case TokenType::EOFTOK:
                 LogDebug("EOF encountered");
-                return;
+                return std::move(ASTRoot);
             case TokenType::INVALID_TOK:
                 LogDebug("Invalid token found");
                 throw ParserException("Invalid token found");
-                return;
             default:
                 LogDebug("Parsing top level expression");
                 handleTopLevelExpression();
@@ -41,6 +40,8 @@ void Parser::parse() {
     catch (ParserException& ex) {
         LogParsingError(ex.what());
     }
+
+    return std::move(ASTRoot);
 }
 
 void Parser::handleTopLevelExpression() {

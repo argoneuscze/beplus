@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "parser/Parser.h"
+#include "simple_interpreter/SimpleInterpreter.h"
 
 void startREPL() {
     while (true) {
@@ -13,11 +14,10 @@ void startREPL() {
         std::getline(std::cin, input);
         std::istringstream stream(input);
 
-        // EVALUATE
+        // EVALUATE & PRINT
         auto parser = std::make_unique<Parser>(stream);
-        parser->parse();
-
-        // PRINT
-        // TODO
+        auto nodes = parser->parse();
+        
+        auto interpreter = std::make_unique<SimpleInterpreter>(nodes);
     }
 }

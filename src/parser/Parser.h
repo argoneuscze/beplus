@@ -49,7 +49,7 @@ class Parser {
 public:
     explicit Parser(std::istream& input);
 
-    void parse();
+    std::vector<std::unique_ptr<ASTNode>> parse();
 
 private:
     void handleTopLevelExpression();

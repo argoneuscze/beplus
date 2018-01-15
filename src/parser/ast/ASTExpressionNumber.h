@@ -10,6 +10,10 @@ public:
         v->visit(this);
     }
 
+    long getValue() const {
+        return Value;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "NUM " << Value;

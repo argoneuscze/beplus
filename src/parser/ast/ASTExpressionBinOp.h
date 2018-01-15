@@ -15,6 +15,18 @@ public:
         v->visit(this);
     }
 
+    BinOp getOperator() const {
+        return Operator;
+    }
+
+    ASTExpression* getLHS() const {
+        return LHS.get();
+    }
+
+    ASTExpression* getRHS() const {
+        return RHS.get();
+    }
+
 protected:
     void print(std::ostream& os) const override {
         std::string opString;
