@@ -6,13 +6,26 @@
 
 class ASTBlock : public ASTNode {
 public:
-    ASTBlock() { }
-    void pushNode(std::unique_ptr<ASTNode> node) {
-        Block.push_back(std::move(node));
-    }
+    ASTBlock(std::vector<std::unique_ptr<ASTNode>> vecBlock) : Block(std::move(vecBlock)), Idx(0) { }
 
     void accept(Visitor * v) override {
         v->visit(this);
+    }
+
+    const std::vector<std::unique_ptr<ASTNode>> * getStatements() const {
+        return &Block;
+    }
+
+    // Zeros out the index so that the class can generate each node easily.
+    void initNodeGeneration() {
+        Idx = 0;
+    }
+
+    ASTNode * getNextNode() {
+        if (Idx >= Block.size())
+            return nullptr;
+
+        return Block[Idx++].get(); // post increment - returns Block[i]
     }
   
 protected:
@@ -22,5 +35,6 @@ protected:
     }
 
 private:
-    std::vector<std::unique_ptr<ASTNode>> Block;
+    const std::vector<std::unique_ptr<ASTNode>> Block;
+    int Idx;
 };

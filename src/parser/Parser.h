@@ -9,6 +9,7 @@
 
 #include "ast/ASTArgument.h"
 #include "ast/ASTExpression.h"
+#include "ast/ASTFunction.h"
 #include "ast/ASTFunctionPrototype.h"
 #include "ast/ASTExpressionNumber.h"
 #include "ast/ASTExpressionBinOp.h"

@@ -14,6 +14,7 @@ SimpleInterpreter::SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>
 
 void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
+    func->getBlock()->accept(this);
 }
 
 void SimpleInterpreter::visit(ASTArgument* arg) {
@@ -57,7 +58,12 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
-    std::cout << "Simple interpreter visiting a block" << std::endl;
+    ASTNode * node;
+    std::cout << "[SimInt] Visiting a block" << std::endl;
+
+    for(auto& node : *(block->getStatements())) {
+        node->accept(this);
+    }
 }
 
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {

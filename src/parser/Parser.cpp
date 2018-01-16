@@ -140,6 +140,7 @@ std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
 }
 
 // function ::= 'def' prototype '{' statement* '}'
+// TODO build function together with its prototype - ultranaive implementation
 void Parser::handleFunction() {
     Lexer->readNextToken(); // eat def
 
@@ -159,6 +160,10 @@ void Parser::handleFunction() {
         throw ParserException(err);
     }
     Lexer->readNextToken(); // eat '}'
+
+    auto fn = std::make_unique<ASTFunction>("TESTNAME", std::move(block));
+
+    ASTRoot.push_back(std::move(fn));
 }
 
 // prototype ::= identifier '(' arguments ')' ':' datatype
@@ -274,7 +279,7 @@ std::unique_ptr<ASTStatement> Parser::parseStatement() {
 
     if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
         err = "Expected ';' at the end of a statement, instead got: " + \
-Lexer->getStrValue();
+               Lexer->getStrValue();
         throw ParserException(err);
     }
     Lexer->readNextToken(); // eat ';'
@@ -286,13 +291,15 @@ Lexer->getStrValue();
 // ends with a '}' but eating '}' should be done by the function caller
 std::unique_ptr<ASTBlock> Parser::parseBlock() {
     LogDebug("Parsing a block");
-    auto block = std::make_unique<ASTBlock>();
+    std::vector<std::unique_ptr<ASTNode>> vec;
 
     while (true) {
-        if (Lexer->getCurToken() == TokenType::KW_RIGHTCURLYBRACKET)
+        if (Lexer->getCurToken() == TokenType::KW_RIGHTCURLYBRACKET) {
+            auto block = std::make_unique<ASTBlock>(std::move(vec));
             return block;
+        }
         auto astnode = parseStatement();
-        block->pushNode(std::move(astnode));
+        vec.push_back(std::move(astnode));
     }
 
     throw ParserException("parseBlock() should never get here");
