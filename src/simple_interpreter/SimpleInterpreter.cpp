@@ -60,6 +60,10 @@ void SimpleInterpreter::visit(ASTBlock* block) {
     std::cout << "Simple interpreter visiting a block" << std::endl;
 }
 
+void SimpleInterpreter::visit(ASTStatementDecl* decl) {
+    std::cout << "[SimInt] Visiting a declaration" << std::endl;
+}
+
 void SimpleInterpreter::interpret() {
     for (auto& node : RootNodes) {
         node->accept(this);

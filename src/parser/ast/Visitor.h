@@ -5,6 +5,7 @@ class ASTArgument;
 class ASTExpressionBinOp;
 class ASTExpressionNumber;
 class ASTBlock;
+class ASTStatementDecl;
 
 class Visitor {
 public:
@@ -20,4 +21,5 @@ public:
     virtual void visit(ASTExpressionBinOp* arg) = 0;
     virtual void visit(ASTExpressionNumber* arg) = 0;
     virtual void visit(ASTBlock* block) = 0;
+    virtual void visit(ASTStatementDecl* decl) = 0;
 };

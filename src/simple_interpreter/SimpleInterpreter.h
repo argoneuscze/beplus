@@ -15,6 +15,7 @@ public:
     void visit(ASTExpressionBinOp* binOp) override;
     void visit(ASTExpressionNumber* num) override;
     void visit(ASTBlock* block) override;
+    void visit(ASTStatementDecl* decl) override;
 
 private:
     const std::vector<std::unique_ptr<ASTNode>>& RootNodes;

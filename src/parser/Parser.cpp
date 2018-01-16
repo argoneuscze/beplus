@@ -8,6 +8,7 @@ Parser::Parser(std::istream& input) {
 }
 
 // TODO Change parse() to return a Module
+// TODO more possible parsing options? toplevelstatement?
 std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
     std::string err; // have to declare before switch
     LogDebug("Parsing started");
@@ -233,18 +234,65 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
     }
 }
 
-// block ::= statement*
+// DECL ::= DATATYPE IDENT
+std::unique_ptr<ASTStatementDecl> Parser::parseDecl() {
+    std::string err;
+    LogDebug("Parsing a declaration");
+
+    auto type = Lexer->getDataType(); // datatype already checked by caller
+    Lexer->readNextToken(); // eat DATATYPE
+
+    if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
+        err = "Expected an identifier, instead got: " + Lexer->getStrValue();
+        throw ParserException(err);
+    } 
+    
+    std::string ident = Lexer->getStrValue();
+    Lexer->readNextToken(); // eat IDENT
+
+    return std::make_unique<ASTStatementDecl>(type, ident.c_str());
+}
+
+
+// TODO implement all possible statements
+// statement ::= DECL ';'
+// statement ::= ASSIGN ';'
+// statement ::= CALL ';'
+// statement ::= EXPR ';'
+// Not possible to perform this as a switch/case sequence as decl + assignment
+// is necessary inside of the if block.
+std::unique_ptr<ASTStatement> Parser::parseStatement() {
+    LogDebug("Parsing a statement");
+    std::string err;
+    std::unique_ptr<ASTStatement> stmt;
+
+    // DECL ::= DATATYPE IDENT ';'
+    if (Lexer->getCurToken() == TokenType::KW_DATATYPE) { 
+        stmt = parseDecl();
+    }
+    // TODO else if other statements ...
+
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        err = "Expected ';' at the end of a statement, instead got: " + \
+Lexer->getStrValue();
+        throw ParserException(err);
+    }
+    Lexer->readNextToken(); // eat ';'
+
+    return stmt;
+}
+
+// BLOCK ::= STATEMENT*
 // ends with a '}' but eating '}' should be done by the function caller
-// TODO rename to handleBlock()
 std::unique_ptr<ASTBlock> Parser::parseBlock() {
-    // throw ParserException("parseBlock() NOT IMPLEMENTED");
+    LogDebug("Parsing a block");
     auto block = std::make_unique<ASTBlock>();
 
     while (true) {
         if (Lexer->getCurToken() == TokenType::KW_RIGHTCURLYBRACKET)
             return block;
-        // auto astnode = parseStatement();
-        // block.pushNode(astnode);
+        auto astnode = parseStatement();
+        block->pushNode(std::move(astnode));
     }
 
     throw ParserException("parseBlock() should never get here");
