@@ -10,6 +10,7 @@ enum class TokenType {
     KW_FOR,
     KW_WHILE,
     KW_RETURN,
+    KW_CONST,
 
     // syntax
     KW_LEFTBRACKET,

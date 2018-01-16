@@ -36,6 +36,8 @@ TokenType Lexer::getTok() {
             return TokenType::KW_FOR;
         if (LowerCase == "return")
             return TokenType::KW_RETURN;
+        if (LowerCase == "const")
+            return TokenType::KW_CONST;
 
         if (LowerCase == "void") {
             DtValue = DataType::DT_VOID;
