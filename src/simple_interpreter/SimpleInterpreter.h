@@ -11,6 +11,7 @@ public:
     explicit SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>& rootNodes);
 
     void visit(ASTFunction* func) override;
+    void visit(ASTFunctionPrototype* prototype) override;
     void visit(ASTArgument* arg) override;
     void visit(ASTExpressionBinOp* binOp) override;
     void visit(ASTExpressionNumber* num) override;

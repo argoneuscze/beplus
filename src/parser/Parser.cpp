@@ -161,7 +161,7 @@ void Parser::handleFunction() {
     }
     Lexer->readNextToken(); // eat '}'
 
-    auto fn = std::make_unique<ASTFunction>("TESTNAME", std::move(block));
+    auto fn = std::make_unique<ASTFunction>(std::move(proto), std::move(block));
 
     ASTRoot.push_back(std::move(fn));
 }
@@ -195,10 +195,7 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
     auto type = Lexer->getDataType();
     Lexer->readNextToken(); // eat datatype
 
-    //throw ParserException("Function prototype: Not implemented yet");
-    // TODO make arguments - env etc
-    //return std::make_unique<ASTFunctionPrototype>()
-    return nullptr;
+    return std::make_unique<ASTFunctionPrototype>(name, std::move(args), type);
 }
 
 // arguments ::= datatype identifier ',' | ')'

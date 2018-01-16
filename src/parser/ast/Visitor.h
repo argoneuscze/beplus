@@ -1,6 +1,7 @@
 #pragma once
 
 class ASTFunction;
+class ASTFunctionPrototype;
 class ASTArgument;
 class ASTExpressionBinOp;
 class ASTExpressionNumber;
@@ -17,6 +18,7 @@ public:
     Visitor& operator=(Visitor&& other) noexcept = default;
 
     virtual void visit(ASTFunction* func) = 0;
+    virtual void visit(ASTFunctionPrototype* prototype) = 0;
     virtual void visit(ASTArgument* arg) = 0;
     virtual void visit(ASTExpressionBinOp* arg) = 0;
     virtual void visit(ASTExpressionNumber* arg) = 0;

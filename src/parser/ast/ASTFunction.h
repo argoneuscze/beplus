@@ -2,13 +2,19 @@
 
 #include "ASTNode.h"
 #include "ASTBlock.h"
+#include "ASTFunctionPrototype.h"
 
 class ASTFunction : public ASTNode {
 public:
-    ASTFunction(const char * fnName, std::unique_ptr<ASTBlock> block) : Name(fnName), Block(std::move(block)) { }
+    ASTFunction(std::unique_ptr<ASTFunctionPrototype> prototype, std::unique_ptr<ASTBlock> block) : Prototype(std::move(prototype)), Block(std::move(block)) { }
 
     void accept(Visitor* v) override {
         v->visit(this);
+    }
+
+    // Returns a raw pointer to the prototype so that it can be accepted/visited
+    ASTFunctionPrototype * getPrototype(void) const {
+        return Prototype.get();
     }
 
     // Returns a raw pointer to the Block so that it can be accepted/visited.
@@ -18,10 +24,10 @@ public:
 
 protected:
     void print(std::ostream& os) const override {
-        os << "Function name: " << Name;
+        os << "Function node";
     }
     
 private:
-    const std::unique_ptr<ASTBlock> Block;
-    const char * Name;
+    std::unique_ptr<ASTBlock> Block;
+    std::unique_ptr<ASTFunctionPrototype> Prototype;
 };

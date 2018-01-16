@@ -6,7 +6,7 @@
 
 class ASTBlock : public ASTNode {
 public:
-    ASTBlock(std::vector<std::unique_ptr<ASTNode>> vecBlock) : Block(std::move(vecBlock)), Idx(0) { }
+    ASTBlock(std::vector<std::unique_ptr<ASTNode>> vecBlock) : Block(std::move(vecBlock)) { }
 
     void accept(Visitor * v) override {
         v->visit(this);
@@ -24,5 +24,4 @@ protected:
 
 private:
     const std::vector<std::unique_ptr<ASTNode>> Block;
-    int Idx;
 };
