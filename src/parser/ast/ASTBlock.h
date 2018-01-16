@@ -16,18 +16,6 @@ public:
         return &Block;
     }
 
-    // Zeros out the index so that the class can generate each node easily.
-    void initNodeGeneration() {
-        Idx = 0;
-    }
-
-    ASTNode * getNextNode() {
-        if (Idx >= Block.size())
-            return nullptr;
-
-        return Block[Idx++].get(); // post increment - returns Block[i]
-    }
-  
 protected:
     // Possibly print more? e.g. amount of AST nodes within block?
     void print(std::ostream& os) const override {
