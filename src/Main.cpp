@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "parser/Parser.h"
+#include "simple_interpreter/SimpleInterpreter.h"
 
 void startREPL();
 
@@ -12,7 +13,12 @@ void runParser(const char* filename) {
     file.open(filename);
 
     auto parser = std::make_unique<Parser>(file);
-    parser->parse();
+    auto module = parser->parse();
+
+    if (!module)
+        return;
+
+    auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
 
     file.close();
 }
