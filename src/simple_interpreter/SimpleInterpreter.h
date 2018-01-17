@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include "../parser/ast/Visitor.h"
 #include "../parser/ast/ASTNode.h"
@@ -9,6 +8,22 @@
 
 #include "Environment.h"
 #include "Value.h"
+
+class InterpreterException : std::exception {
+public:
+    //explicit ParserException(const char* msg) {
+    explicit InterpreterException(const std::string& msg) {
+        this->msg = msg;
+    }
+
+    char const* what() const noexcept override {
+        return msg.c_str();
+    }
+
+private:
+    //const char* msg;
+    std::string msg;
+};
 
 class SimpleInterpreter : public Visitor {
 public:

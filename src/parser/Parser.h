@@ -21,7 +21,7 @@
 class ParserException : std::exception {
 public:
     //explicit ParserException(const char* msg) {
-    explicit ParserException(std::string msg) {
+    explicit ParserException(const std::string& msg) {
         this->msg = msg;
     }
 

@@ -107,7 +107,12 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 }
 
 void SimpleInterpreter::interpret() {
-    Module->accept(this);
+    try {
+        Module->accept(this);
+    }
+    catch (InterpreterException& ex) {
+        std::cout << "InterpreterException: " << ex.what() << std::endl;
+    }
 }
 
 void SimpleInterpreter::initEnv() {
