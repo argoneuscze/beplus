@@ -10,15 +10,15 @@
 #include "../parser/ast/ASTBlock.h"
 
 SimpleInterpreter::SimpleInterpreter(::Module* mod)
-    : CurEnv(nullptr), Module(mod), CurValue(nullptr) {
+    : GlobalEnv(nullptr), CurEnv(nullptr), Module(mod), CurValue(nullptr) {
     interpret();
 }
 
 void SimpleInterpreter::visit(::Module* module) {
     std::cout << "[SimInt] Visiting Module" << std::endl;
 
-    // create new environment module-wide
-    CurEnv = initNewEnv();
+    GlobalEnv = std::make_unique<Environment>(nullptr);
+    CurEnv = GlobalEnv.get();
 
     for (auto& node : *module->getNodes()) {
         node->accept(this);
@@ -29,7 +29,7 @@ void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
 
     // create new environment for function
-    forkCurEnv();
+    CurEnv = CurEnv->fork();
 
     // TODO do stuff with function
     func->getPrototype()->accept(this);
@@ -37,7 +37,7 @@ void SimpleInterpreter::visit(ASTFunction* func) {
     func->getBlock()->accept(this);
 
     // restore previous environment
-    restorePrevEnv();
+    CurEnv = CurEnv->restorePrev();
 }
 
 void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
@@ -113,16 +113,4 @@ void SimpleInterpreter::interpret() {
     catch (InterpreterException& ex) {
         std::cout << "InterpreterException: " << ex.what() << std::endl;
     }
-}
-
-std::unique_ptr<Environment> SimpleInterpreter::initNewEnv() {
-    return std::make_unique<Environment>(nullptr);
-}
-
-void SimpleInterpreter::forkCurEnv() {
-    CurEnv = std::make_unique<Environment>(std::move(CurEnv));
-}
-
-void SimpleInterpreter::restorePrevEnv() {
-    CurEnv = std::move(CurEnv->getPrevEnvRvalRef());
 }

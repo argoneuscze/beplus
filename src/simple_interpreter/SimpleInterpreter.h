@@ -40,13 +40,11 @@ public:
     void visit(ASTStatementCall* call) override;
 
 private:
-    std::unique_ptr<Environment> CurEnv;
+    std::unique_ptr<Environment> GlobalEnv;
+    Environment* CurEnv;
+
     Module* const Module;
     std::unique_ptr<Value> CurValue;
 
     void interpret();
-
-    std::unique_ptr<Environment> initNewEnv();
-    void forkCurEnv();
-    void restorePrevEnv();
 };

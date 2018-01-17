@@ -1,15 +1,20 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 class Environment {
 public:
-    explicit Environment(std::unique_ptr<Environment>&& prevEnv);
+    explicit Environment(Environment* prevEnv);
 
-    std::unique_ptr<Environment>&& getPrevEnvRvalRef();
+    // creates and returns a new environment, setting its parent to this one
+    Environment* fork();
+    // destroys the current environment and returns a pointer to the previous one
+    Environment* restorePrev();
 
 private:
-    std::unique_ptr<Environment> PrevEnv;
+    Environment* const PrevEnv;
+    std::vector<std::unique_ptr<Environment>> Children;
 
     Environment* getPrevEnv() const;
 };
