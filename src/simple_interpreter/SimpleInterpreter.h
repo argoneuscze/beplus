@@ -6,7 +6,9 @@
 #include "../parser/ast/Visitor.h"
 #include "../parser/ast/ASTNode.h"
 #include "../parser/ast/Module.h"
+
 #include "Environment.h"
+#include "Value.h"
 
 class SimpleInterpreter : public Visitor {
 public:
@@ -23,10 +25,9 @@ public:
     void visit(ASTStatementCall* call) override;
 
 private:
-    std::unique_ptr<Environment> Environment;
+    Environment* CurEnv;
     Module* const Module;
+    std::unique_ptr<Value> CurValue;
 
     void interpret();
-
-    long ValueNum;
 };

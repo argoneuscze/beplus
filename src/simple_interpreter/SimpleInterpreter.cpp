@@ -1,6 +1,7 @@
 #include "SimpleInterpreter.h"
 
 #include <iostream>
+#include <cassert>
 
 #include "../parser/ast/ASTArgument.h"
 #include "../parser/ast/ASTFunction.h"
@@ -9,14 +10,14 @@
 #include "../parser/ast/ASTBlock.h"
 
 SimpleInterpreter::SimpleInterpreter(::Module* mod)
-    : Environment(std::make_unique<::Environment>()), Module(mod), ValueNum(0) {
+    : CurEnv(nullptr), Module(mod), CurValue(nullptr) {
     interpret();
 }
 
 void SimpleInterpreter::visit(::Module* module) {
     std::cout << "[SimInt] Visiting Module" << std::endl;
 
-    // todo create root env etc.
+    CurEnv = std::make_unique<Environment>(nullptr).get();
 
     for (auto& node : *module->getNodes()) {
         node->accept(this);
@@ -45,35 +46,39 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 
     // evaluate left side
     binOp->getLHS()->accept(this);
-    const auto val1 = ValueNum;
+    const auto val1_ptr = std::move(CurValue);
+    const auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     // evaluate right side
     binOp->getRHS()->accept(this);
-    const auto val2 = ValueNum;
+    const auto val2_ptr = std::move(CurValue);
+    const auto val2 = dynamic_cast<ValueNumber*>(val2_ptr.get());
+
+    assert(val1 != nullptr && val2 != nullptr);
 
     // calculate the result and store it
     switch (op) {
     case BinOp::OP_ADD:
-        ValueNum = val1 + val2;
+        CurValue = std::make_unique<ValueNumber>(val1->getValue() + val2->getValue());
         break;
     case BinOp::OP_SUB:
-        ValueNum = val1 - val2;
+        CurValue = std::make_unique<ValueNumber>(val1->getValue() - val2->getValue());
         break;
     case BinOp::OP_MUL:
-        ValueNum = val1 * val2;
+        CurValue = std::make_unique<ValueNumber>(val1->getValue() * val2->getValue());
         break;
     case BinOp::OP_DIV:
-        ValueNum = val1 / val2;
+        CurValue = std::make_unique<ValueNumber>(val1->getValue() / val2->getValue());
         break;
     default:
         break;
     }
 
-    std::cout << "Result: " << ValueNum << std::endl;
+    std::cout << "Result: " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
-    ValueNum = num->getValue();
+    CurValue = std::make_unique<ValueNumber>(num->getValue());
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
