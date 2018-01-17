@@ -64,10 +64,10 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
-    ASTNode * node;
+    ASTNode* node;
     std::cout << "[SimInt] Visiting a block" << std::endl;
 
-    for(auto& node : *(block->getStatements())) {
+    for (auto& node : *(block->getStatements())) {
         node->accept(this);
     }
 }

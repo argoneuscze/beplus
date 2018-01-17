@@ -6,7 +6,9 @@
 
 class ASTFunctionPrototype : public ASTNode {
 public:
-    ASTFunctionPrototype(const std::string name, std::vector<std::unique_ptr<ASTArgument>> args, const DataType type) : Name(std::move(name)), Args(std::move(args)), DType(type) { }
+    ASTFunctionPrototype(const std::string name, std::vector<std::unique_ptr<ASTArgument>> args,
+                         const DataType type) : Args(std::move(args)), Name(std::move(name)), DType(type) {
+    }
 
     void accept(Visitor* v) override {
         v->visit(this);
@@ -16,7 +18,7 @@ public:
         return Name;
     }
 
-    const std::vector<std::unique_ptr<ASTArgument>> * getArgs(void) const {
+    const std::vector<std::unique_ptr<ASTArgument>>* getArgs(void) const {
         return &Args;
     }
 

@@ -17,7 +17,7 @@ void startREPL() {
         // EVALUATE & PRINT
         auto parser = std::make_unique<Parser>(stream);
         auto nodes = parser->parse();
-        
+
         auto interpreter = std::make_unique<SimpleInterpreter>(nodes);
     }
 }

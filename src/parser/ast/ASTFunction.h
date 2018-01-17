@@ -6,19 +6,21 @@
 
 class ASTFunction : public ASTNode {
 public:
-    ASTFunction(std::unique_ptr<ASTFunctionPrototype> prototype, std::unique_ptr<ASTBlock> block) : Prototype(std::move(prototype)), Block(std::move(block)) { }
+    ASTFunction(std::unique_ptr<ASTFunctionPrototype> prototype, std::unique_ptr<ASTBlock> block) :
+        Block(std::move(block)), Prototype(std::move(prototype)) {
+    }
 
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
     // Returns a raw pointer to the prototype so that it can be accepted/visited
-    ASTFunctionPrototype * getPrototype(void) const {
+    ASTFunctionPrototype* getPrototype(void) const {
         return Prototype.get();
     }
 
     // Returns a raw pointer to the Block so that it can be accepted/visited.
-    ASTBlock * getBlock(void) const {
+    ASTBlock* getBlock(void) const {
         return Block.get();
     }
 
@@ -26,7 +28,7 @@ protected:
     void print(std::ostream& os) const override {
         os << "Function node";
     }
-    
+
 private:
     std::unique_ptr<ASTBlock> Block;
     std::unique_ptr<ASTFunctionPrototype> Prototype;

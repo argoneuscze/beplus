@@ -4,13 +4,14 @@
 
 class ASTStatementDecl : public ASTStatement {
 public:
-    explicit ASTStatementDecl(DataType type, const char * id) : Type(type), Ident(id) { }
-
-    void accept(Visitor* v) override {
-       v->visit(this);
+    explicit ASTStatementDecl(DataType type, const char* id) : Type(type), Ident(id) {
     }
 
-    const char * getIdent() const {
+    void accept(Visitor* v) override {
+        v->visit(this);
+    }
+
+    const char* getIdent() const {
         return Ident;
     }
 
@@ -21,5 +22,5 @@ protected:
 
 private:
     DataType Type;
-    const char * Ident;
+    const char* Ident;
 };

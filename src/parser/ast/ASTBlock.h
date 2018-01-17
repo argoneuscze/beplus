@@ -6,13 +6,14 @@
 
 class ASTBlock : public ASTNode {
 public:
-    ASTBlock(std::vector<std::unique_ptr<ASTNode>> vecBlock) : Block(std::move(vecBlock)) { }
+    ASTBlock(std::vector<std::unique_ptr<ASTNode>> vecBlock) : Block(std::move(vecBlock)) {
+    }
 
-    void accept(Visitor * v) override {
+    void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    const std::vector<std::unique_ptr<ASTNode>> * getStatements() const {
+    const std::vector<std::unique_ptr<ASTNode>>* getStatements() const {
         return &Block;
     }
 

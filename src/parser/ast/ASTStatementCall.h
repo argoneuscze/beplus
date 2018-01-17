@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <memory>
@@ -9,7 +10,10 @@
 
 class ASTStatementCall : public ASTStatement {
 public:
-    explicit ASTStatementCall(const std::string name, std::vector<std::unique_ptr<ASTExpression>> args) : FnName(name), Args(std::move(args)) { }
+    explicit ASTStatementCall(std::string name,
+                              std::vector<std::unique_ptr<ASTExpression>> args) : Args(std::move(args)),
+                                                                                  FnName(std::move(name)) {
+    }
 
     void accept(Visitor* v) override {
         v->visit(this);

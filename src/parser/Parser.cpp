@@ -246,8 +246,8 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
     if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
         err = "Expected an identifier, instead got: " + Lexer->getStrValue();
         throw ParserException(err);
-    } 
-    
+    }
+
     std::string ident = Lexer->getStrValue();
     Lexer->readNextToken(); // eat IDENT
 
@@ -270,11 +270,11 @@ std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
         return std::make_unique<ASTStatementCall>(ident, std::move(args));
 
     // ARGS ::= EXPR , EXPR , ...
-    while(true) {
+    while (true) {
         auto arg = parseExpression();
         args.push_back(std::move(arg));
 
-        switch(Lexer->getCurToken()) {
+        switch (Lexer->getCurToken()) {
         case TokenType::KW_COMMA:
             Lexer->readNextToken(); // eat ',' 
             continue;
@@ -303,12 +303,12 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     std::unique_ptr<ASTStatement> stmt;
 
     // DECL ::= DATATYPE IDENT ';'
-    if (Lexer->getCurToken() == TokenType::KW_DATATYPE) { 
+    if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
     }
-    // CALL ::= IDENT '('
-    // ASSIGN ::= IDENT '='
-    // EXPR ::= IDENT BINOP
+        // CALL ::= IDENT '('
+        // ASSIGN ::= IDENT '='
+        // EXPR ::= IDENT BINOP
     else if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
         std::string ident = Lexer->getStrValue();
         Lexer->readNextToken(); // eat IDENT
@@ -319,8 +319,8 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // TODO else if other statements ...
 
     if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-        err = "Expected ';' at the end of a statement, instead got: " + \
-               Lexer->getStrValue();
+        err = "Expected ';' at the end of a statement, instead got: " +
+            Lexer->getStrValue();
         throw ParserException(err);
     }
     Lexer->readNextToken(); // eat ';'
