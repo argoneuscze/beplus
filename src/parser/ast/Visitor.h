@@ -7,6 +7,7 @@ class ASTExpressionBinOp;
 class ASTExpressionNumber;
 class ASTBlock;
 class ASTStatementDecl;
+class ASTStatementCall;
 
 class Visitor {
 public:
@@ -24,4 +25,5 @@ public:
     virtual void visit(ASTExpressionNumber* arg) = 0;
     virtual void visit(ASTBlock* block) = 0;
     virtual void visit(ASTStatementDecl* decl) = 0;
+    virtual void visit(ASTStatementCall* call) = 0;
 };

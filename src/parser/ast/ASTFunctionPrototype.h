@@ -12,6 +12,18 @@ public:
         v->visit(this);
     }
 
+    const std::string getName(void) const {
+        return Name;
+    }
+
+    const std::vector<std::unique_ptr<ASTArgument>> * getArgs(void) const {
+        return &Args;
+    }
+
+    const DataType getType(void) const {
+        return DType;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "Function prototype";

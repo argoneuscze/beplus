@@ -15,6 +15,7 @@
 #include "ast/ASTExpressionBinOp.h"
 #include "ast/ASTBlock.h"
 #include "ast/ASTStatementDecl.h"
+#include "ast/ASTStatementCall.h"
 
 class ParserException : std::exception {
 public:
@@ -70,8 +71,9 @@ private:
     std::unique_ptr<ASTExpressionNumber> parseNumberExpression();
     std::unique_ptr<ASTExpression> parseParenthesisExpression();
 
-    std::unique_ptr<ASTStatement> parseStatement();
-    std::unique_ptr<ASTStatementDecl> parseDecl();
+    std::unique_ptr<ASTStatement> parseStatement(void);
+    std::unique_ptr<ASTStatementDecl> parseDecl(void);
+    std::unique_ptr<ASTStatementCall> parseCall(std::string ident);
 
     std::unique_ptr<ASTBlock> parseBlock();
 

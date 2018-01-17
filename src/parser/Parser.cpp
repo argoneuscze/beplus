@@ -140,7 +140,6 @@ std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
 }
 
 // function ::= 'def' prototype '{' statement* '}'
-// TODO build function together with its prototype - ultranaive implementation
 void Parser::handleFunction() {
     Lexer->readNextToken(); // eat def
 
@@ -237,7 +236,7 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
 }
 
 // DECL ::= DATATYPE IDENT
-std::unique_ptr<ASTStatementDecl> Parser::parseDecl() {
+std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
     std::string err;
     LogDebug("Parsing a declaration");
 
@@ -255,6 +254,41 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl() {
     return std::make_unique<ASTStatementDecl>(type, ident.c_str());
 }
 
+// CALL ::= ARGS* ')'
+// ident passed as an argument due to the parser needing to see the bracket
+// to decide whether the statement really is a function call.
+// possible TODO - check the module whether the function prototype actually
+//                 exists and can be satisfied with this call?
+std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
+    std::string err;
+    LogDebug("Parsing a call");
+
+    std::vector<std::unique_ptr<ASTExpression>> args;
+    Lexer->readNextToken(); // eat '('
+
+    if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET)
+        return std::make_unique<ASTStatementCall>(ident, std::move(args));
+
+    // ARGS ::= EXPR , EXPR , ...
+    while(true) {
+        auto arg = parseExpression();
+        args.push_back(std::move(arg));
+
+        switch(Lexer->getCurToken()) {
+        case TokenType::KW_COMMA:
+            Lexer->readNextToken(); // eat ',' 
+            continue;
+        case TokenType::KW_RIGHTBRACKET:
+            Lexer->readNextToken(); // eat ')'
+            return std::make_unique<ASTStatementCall>(ident, std::move(args));
+        default:
+            err = "Expected ',' or ')', instead got: " + Lexer->getStrValue();
+            throw ParserException(err);
+        }
+    }
+
+    throw ParserException("parseCall() should never get here.");
+}
 
 // TODO implement all possible statements
 // statement ::= DECL ';'
@@ -263,7 +297,7 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl() {
 // statement ::= EXPR ';'
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
-std::unique_ptr<ASTStatement> Parser::parseStatement() {
+std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     LogDebug("Parsing a statement");
     std::string err;
     std::unique_ptr<ASTStatement> stmt;
@@ -271,6 +305,16 @@ std::unique_ptr<ASTStatement> Parser::parseStatement() {
     // DECL ::= DATATYPE IDENT ';'
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) { 
         stmt = parseDecl();
+    }
+    // CALL ::= IDENT '('
+    // ASSIGN ::= IDENT '='
+    // EXPR ::= IDENT BINOP
+    else if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
+        std::string ident = Lexer->getStrValue();
+        Lexer->readNextToken(); // eat IDENT
+        if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
+            stmt = parseCall(ident);
+        // TODO else if other statements starting with ident ...
     }
     // TODO else if other statements ...
 

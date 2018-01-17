@@ -15,6 +15,7 @@ SimpleInterpreter::SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>
 void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
     func->getPrototype()->accept(this);
+    // TODO - push prototype args into env, check their existence ...
     func->getBlock()->accept(this);
 }
 
@@ -73,6 +74,10 @@ void SimpleInterpreter::visit(ASTBlock* block) {
 
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTStatementCall* call) {
+    std::cout << "[SimInt] Visiting a call" << std::endl;
 }
 
 void SimpleInterpreter::interpret() {
