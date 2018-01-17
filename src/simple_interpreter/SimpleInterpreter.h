@@ -9,8 +9,9 @@
 
 class SimpleInterpreter : public Visitor {
 public:
-    explicit SimpleInterpreter(const Module* mod);
+    explicit SimpleInterpreter(Module* mod);
 
+    void visit(Module* module) override;
     void visit(ASTFunction* func) override;
     void visit(ASTFunctionPrototype* prototype) override;
     void visit(ASTArgument* arg) override;
@@ -21,7 +22,7 @@ public:
     void visit(ASTStatementCall* call) override;
 
 private:
-    const Module* Module;
+    Module* const Module;
 
     void interpret();
 

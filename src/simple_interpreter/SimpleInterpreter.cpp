@@ -8,8 +8,18 @@
 #include "../parser/ast/ASTExpressionNumber.h"
 #include "../parser/ast/ASTBlock.h"
 
-SimpleInterpreter::SimpleInterpreter(const ::Module* mod) : Module(mod), ValueNum(0) {
+SimpleInterpreter::SimpleInterpreter(::Module* mod) : Module(mod), ValueNum(0) {
     interpret();
+}
+
+void SimpleInterpreter::visit(::Module* module) {
+    std::cout << "[SimInt] Visiting Module" << std::endl;
+
+    // todo create root env etc.
+
+    for (auto& node : *module->getNodes()) {
+        node->accept(this);
+    }
 }
 
 void SimpleInterpreter::visit(ASTFunction* func) {
@@ -27,6 +37,8 @@ void SimpleInterpreter::visit(ASTArgument* arg) {
 }
 
 void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
+    std::cout << "[SimInt] Visiting ASTExpressionBinOp" << std::endl;
+
     // get operator
     const auto op = binOp->getOperator();
 
@@ -80,7 +92,5 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 }
 
 void SimpleInterpreter::interpret() {
-    for (auto& node : *Module->getNodes()) {
-        node->accept(this);
-    }
+    Module->accept(this);
 }
