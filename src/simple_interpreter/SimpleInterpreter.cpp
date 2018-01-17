@@ -17,7 +17,8 @@ SimpleInterpreter::SimpleInterpreter(::Module* mod)
 void SimpleInterpreter::visit(::Module* module) {
     std::cout << "[SimInt] Visiting Module" << std::endl;
 
-    CurEnv = std::make_unique<Environment>(nullptr).get();
+    // create new environment module-wide
+    initEnv();
 
     for (auto& node : *module->getNodes()) {
         node->accept(this);
@@ -26,9 +27,17 @@ void SimpleInterpreter::visit(::Module* module) {
 
 void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
+
+    // create new environment for function
+    forkCurEnv();
+
+    // TODO do stuff with function
     func->getPrototype()->accept(this);
     // TODO - push prototype args into env, check their existence ...
     func->getBlock()->accept(this);
+
+    // restore previous environment
+    restorePrevEnv();
 }
 
 void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
@@ -99,4 +108,16 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 
 void SimpleInterpreter::interpret() {
     Module->accept(this);
+}
+
+void SimpleInterpreter::initEnv() {
+    CurEnv = std::make_unique<Environment>(nullptr);
+}
+
+void SimpleInterpreter::forkCurEnv() {
+    CurEnv = std::make_unique<Environment>(std::move(CurEnv));
+}
+
+void SimpleInterpreter::restorePrevEnv() {
+    CurEnv = std::move(CurEnv->getPrevEnvRvalRef());
 }

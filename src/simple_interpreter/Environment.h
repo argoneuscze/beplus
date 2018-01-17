@@ -1,12 +1,15 @@
 #pragma once
 
+#include <memory>
+
 class Environment {
 public:
-    explicit Environment(Environment* prevEnv) : PrevEnv(prevEnv) {
-    }
+    explicit Environment(std::unique_ptr<Environment>&& prevEnv);
+
+    std::unique_ptr<Environment>&& getPrevEnvRvalRef();
 
 private:
-    Environment* const PrevEnv;
+    std::unique_ptr<Environment> PrevEnv;
 
     Environment* getPrevEnv() const;
 };
