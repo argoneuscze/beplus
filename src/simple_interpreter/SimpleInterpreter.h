@@ -46,7 +46,7 @@ private:
 
     void interpret();
 
-    void initEnv();
+    std::unique_ptr<Environment> initNewEnv();
     void forkCurEnv();
     void restorePrevEnv();
 };

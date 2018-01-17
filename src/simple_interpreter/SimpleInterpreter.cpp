@@ -18,7 +18,7 @@ void SimpleInterpreter::visit(::Module* module) {
     std::cout << "[SimInt] Visiting Module" << std::endl;
 
     // create new environment module-wide
-    initEnv();
+    CurEnv = initNewEnv();
 
     for (auto& node : *module->getNodes()) {
         node->accept(this);
@@ -115,8 +115,8 @@ void SimpleInterpreter::interpret() {
     }
 }
 
-void SimpleInterpreter::initEnv() {
-    CurEnv = std::make_unique<Environment>(nullptr);
+std::unique_ptr<Environment> SimpleInterpreter::initNewEnv() {
+    return std::make_unique<Environment>(nullptr);
 }
 
 void SimpleInterpreter::forkCurEnv() {
