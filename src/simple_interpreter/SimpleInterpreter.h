@@ -5,10 +5,11 @@
 
 #include "../parser/ast/Visitor.h"
 #include "../parser/ast/ASTNode.h"
+#include "../parser/ast/Module.h"
 
 class SimpleInterpreter : public Visitor {
 public:
-    explicit SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>& rootNodes);
+    explicit SimpleInterpreter(const Module* mod);
 
     void visit(ASTFunction* func) override;
     void visit(ASTFunctionPrototype* prototype) override;
@@ -20,7 +21,7 @@ public:
     void visit(ASTStatementCall* call) override;
 
 private:
-    const std::vector<std::unique_ptr<ASTNode>>& RootNodes;
+    const Module* Module;
 
     void interpret();
 

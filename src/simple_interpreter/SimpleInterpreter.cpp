@@ -1,14 +1,14 @@
 #include "SimpleInterpreter.h"
 
+#include <iostream>
+
 #include "../parser/ast/ASTArgument.h"
 #include "../parser/ast/ASTFunction.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
 #include "../parser/ast/ASTExpressionNumber.h"
 #include "../parser/ast/ASTBlock.h"
-#include <iostream>
 
-SimpleInterpreter::SimpleInterpreter(const std::vector<std::unique_ptr<ASTNode>>& rootNodes)
-    : RootNodes(rootNodes), ValueNum(0) {
+SimpleInterpreter::SimpleInterpreter(const ::Module* mod) : Module(mod), ValueNum(0) {
     interpret();
 }
 
@@ -64,7 +64,6 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
-    ASTNode* node;
     std::cout << "[SimInt] Visiting a block" << std::endl;
 
     for (auto& node : *(block->getStatements())) {
@@ -81,7 +80,7 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 }
 
 void SimpleInterpreter::interpret() {
-    for (auto& node : RootNodes) {
+    for (auto& node : *Module->getNodes()) {
         node->accept(this);
     }
 }

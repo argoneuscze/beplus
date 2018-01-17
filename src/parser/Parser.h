@@ -16,6 +16,7 @@
 #include "ast/ASTBlock.h"
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementCall.h"
+#include "ast/Module.h"
 
 class ParserException : std::exception {
 public:
@@ -56,7 +57,7 @@ class Parser {
 public:
     explicit Parser(std::istream& input);
 
-    std::vector<std::unique_ptr<ASTNode>> parse();
+    std::unique_ptr<Module> parse();
 
 private:
     void handleTopLevelExpression();
@@ -81,5 +82,6 @@ private:
     std::vector<std::unique_ptr<ASTArgument>> parseArguments();
 
     std::unique_ptr<Lexer> Lexer;
-    std::vector<std::unique_ptr<ASTNode>> ASTRoot;
+
+    std::vector<std::unique_ptr<ASTNode>> ASTNodes;
 };

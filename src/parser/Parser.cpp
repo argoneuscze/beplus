@@ -1,4 +1,6 @@
 #include <string> // string concat - error output
+#include <cassert>
+
 #include "Parser.h"
 
 #include "Util.h"
@@ -9,7 +11,7 @@ Parser::Parser(std::istream& input) {
 
 // TODO Change parse() to return a Module
 // TODO more possible parsing options? toplevelstatement?
-std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
+std::unique_ptr<Module> Parser::parse() {
     std::string err; // have to declare before switch
     LogDebug("Parsing started");
 
@@ -30,7 +32,7 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
                 break;
             case TokenType::EOFTOK:
                 LogDebug("EOF encountered");
-                return std::move(ASTRoot);
+                return std::make_unique<Module>(std::move(ASTNodes));
             case TokenType::INVALID_TOK:
                 // LogDebug("Invalid token found"); // no need to logdebug
                 err = "Invalid token found: " + Lexer->getStrValue();
@@ -46,7 +48,7 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
         LogParsingError(ex.what());
     }
 
-    return std::move(ASTRoot);
+    return nullptr;
 }
 
 void Parser::handleTopLevelExpression() {
@@ -62,7 +64,7 @@ instead got " + Lexer->getStrValue();
 
     Lexer->readNextToken(); // eat ';'
 
-    ASTRoot.push_back(std::move(expr));
+    ASTNodes.push_back(std::move(expr));
 }
 
 int Parser::getTokPrecedence() const {
@@ -162,7 +164,7 @@ void Parser::handleFunction() {
 
     auto fn = std::make_unique<ASTFunction>(std::move(proto), std::move(block));
 
-    ASTRoot.push_back(std::move(fn));
+    ASTNodes.push_back(std::move(fn));
 }
 
 // prototype ::= identifier '(' arguments ')' ':' datatype
@@ -343,7 +345,7 @@ std::unique_ptr<ASTBlock> Parser::parseBlock() {
         vec.push_back(std::move(astnode));
     }
 
-    throw ParserException("parseBlock() should never get here");
+    assert("parseBlock() should never get here" && 0);
 }
 
 BinOpPrecedence Parser::OpPrecedence = BinOpPrecedence();
