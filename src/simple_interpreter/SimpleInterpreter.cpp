@@ -8,7 +8,8 @@
 #include "../parser/ast/ASTExpressionNumber.h"
 #include "../parser/ast/ASTBlock.h"
 
-SimpleInterpreter::SimpleInterpreter(::Module* mod) : Module(mod), ValueNum(0) {
+SimpleInterpreter::SimpleInterpreter(::Module* mod)
+    : Environment(std::make_unique<::Environment>()), Module(mod), ValueNum(0) {
     interpret();
 }
 
