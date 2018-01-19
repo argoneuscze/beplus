@@ -363,7 +363,7 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     }
     // EXPR ::= NUMBER BINOP*
     // ANYTHING ::= EXPR (basically last resort, e.g. starting with '(')
-    else if (Lexer->getCurToken() == TokenType::NUMBER) {
+    else if (Lexer->getCurToken() == TokenType::NUMBER || Lexer->getCurToken() == TokenType::KW_LEFTBRACKET) {
         auto expr = parseExpression();
         stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
     }

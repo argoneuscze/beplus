@@ -11,6 +11,10 @@ public:
         v->visit(this);
     }
 
+    const std::string & getName(void) const {
+        return VarName;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementAssign into var: " << VarName;

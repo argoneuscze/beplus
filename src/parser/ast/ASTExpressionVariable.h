@@ -11,7 +11,7 @@ public:
         v->visit(this);
     }
 
-    const std::string getName() const {
+    const std::string & getName() const {
         return VarName;
     }
 

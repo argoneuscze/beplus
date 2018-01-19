@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "ASTStatement.h"
 #include "../Lexer.h" // Lexer::DataType
 
@@ -11,7 +12,7 @@ public:
         v->visit(this);
     }
 
-    const char* getIdent() const {
+    const std::string & getIdent() const {
         return Ident;
     }
 
@@ -22,5 +23,5 @@ protected:
 
 private:
     DataType Type;
-    const char* Ident;
+    const std::string Ident;
 };

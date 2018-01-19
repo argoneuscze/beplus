@@ -1,23 +1,33 @@
 #include "Environment.h"
 
 #include <cassert>
+#include <iostream> // [DBG]
 
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {
 }
 
-void Environment::setVariable(std::string& name, const std::shared_ptr<Value>& value) {
+void Environment::setVariable(const std::string & name, const std::shared_ptr<Value> value) {
+    std::cout << "[Env] Setting " << name << std::endl;
     Variables[name] = value;
+    std::cout << "[Env] Variables.size: " << Variables.size() << std::endl;
 }
 
-std::shared_ptr<Value> Environment::getVariable(std::string& name) {
+std::shared_ptr<Value> Environment::getVariable(const std::string & name) {
+    std::cout << "[Env] Variables.size: " << Variables.size() << std::endl;
+    std::cout << "[Env] Trying to find: " << name << std::endl;
+
     const auto val = Variables.find(name);
     // check if current environment has variable
-    if (val != Variables.end())
+    if (val != Variables.end()) {
+        std::cout << "[Env] Found var" << std::endl;
         return val->second;
+    }
     // value not found, check parents, if exist
     // return nullptr if no parent
-    if (!PrevEnv)
+    if (!PrevEnv) {
+        std::cout << "[Env] Could not find var in Env" << std::endl;
         return nullptr;
+    }
     // otherwise return parent's getVariable
     return PrevEnv->getVariable(name);
 }

@@ -7,7 +7,9 @@
 #include "../parser/ast/ASTFunction.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
 #include "../parser/ast/ASTExpressionNumber.h"
+#include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
+#include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTBlock.h"
 
@@ -95,6 +97,8 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
+    auto val = CurEnv->getVariable(var->getName());
+    //std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(val.get()) << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
@@ -115,6 +119,8 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
+
+    CurEnv->setVariable(decl->getIdent(), std::make_shared<ValueNumber>(101)); 
 }
 
 void SimpleInterpreter::visit(ASTStatementExpr* expr) {

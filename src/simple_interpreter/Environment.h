@@ -11,9 +11,9 @@ public:
     explicit Environment(Environment* prevEnv);
 
     // sets a new variable in the environment
-    void setVariable(std::string& name, const std::shared_ptr<Value>& value);
+    void setVariable(const std::string & name, const std::shared_ptr<Value> value);
     // gets a shared pointer to a variable
-    std::shared_ptr<Value> getVariable(std::string& name);
+    std::shared_ptr<Value> getVariable(const std::string & name);
 
     // creates and returns a new environment, setting its parent to this one
     Environment* fork();
