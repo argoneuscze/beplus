@@ -6,9 +6,12 @@ class ASTFunctionPrototype;
 class ASTArgument;
 class ASTExpressionBinOp;
 class ASTExpressionNumber;
+class ASTExpressionVariable;
 class ASTBlock;
-class ASTStatementDecl;
+class ASTStatementAssign;
 class ASTStatementCall;
+class ASTStatementDecl;
+class ASTStatementExpr;
 
 class Visitor {
 public:
@@ -25,9 +28,12 @@ public:
     virtual void visit(ASTArgument* arg) = 0;
     virtual void visit(ASTExpressionBinOp* arg) = 0;
     virtual void visit(ASTExpressionNumber* arg) = 0;
+    virtual void visit(ASTExpressionVariable* var) = 0;
     virtual void visit(ASTBlock* block) = 0;
-    virtual void visit(ASTStatementDecl* decl) = 0;
+    virtual void visit(ASTStatementAssign* assign) = 0;
     virtual void visit(ASTStatementCall* call) = 0;
+    virtual void visit(ASTStatementDecl* decl) = 0;
+    virtual void visit(ASTStatementExpr* expr) = 0;
 };
 
 class Visitable {

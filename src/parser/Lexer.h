@@ -23,6 +23,7 @@ enum class TokenType {
     KW_COLON,
     KW_COMMA,
     KW_BINARYOP,
+    KW_EQUALITYOP,
 
     // user-defined
     IDENTIFIER,
@@ -57,6 +58,7 @@ public:
     long getNumValue() const;
     bool getBoolValue() const;
     std::string getStrValue() const;
+    std::string getCurSymbol() const;
     DataType getDataType() const;
     BinOp getBinOp() const;
 private:
@@ -68,6 +70,7 @@ private:
     long NumValue;
     bool BoolValue;
     std::string StrValue;
+    std::string CurSymbol;
     DataType DtValue;
     BinOp BinValue;
 };

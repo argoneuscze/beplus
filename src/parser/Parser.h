@@ -12,15 +12,17 @@
 #include "ast/ASTFunction.h"
 #include "ast/ASTFunctionPrototype.h"
 #include "ast/ASTExpressionNumber.h"
+#include "ast/ASTExpressionVariable.h"
 #include "ast/ASTExpressionBinOp.h"
 #include "ast/ASTBlock.h"
-#include "ast/ASTStatementDecl.h"
+#include "ast/ASTStatementAssign.h"
 #include "ast/ASTStatementCall.h"
+#include "ast/ASTStatementDecl.h"
+#include "ast/ASTStatementExpr.h"
 #include "ast/Module.h"
 
 class ParserException : std::exception {
 public:
-    //explicit ParserException(const char* msg) {
     explicit ParserException(const std::string& msg) {
         this->msg = msg;
     }
@@ -70,11 +72,13 @@ private:
     std::unique_ptr<ASTExpression> parsePrimary();
     std::unique_ptr<ASTExpression> parseBinOpRHS(int prec, std::unique_ptr<ASTExpression> LHS);
     std::unique_ptr<ASTExpressionNumber> parseNumberExpression();
+    std::unique_ptr<ASTExpressionVariable> parseVariableExpression(void);
     std::unique_ptr<ASTExpression> parseParenthesisExpression();
 
     std::unique_ptr<ASTStatement> parseStatement(void);
     std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::unique_ptr<ASTStatementCall> parseCall(std::string ident);
+    std::unique_ptr<ASTStatementAssign> parseAssignment(const std::string ident);
 
     std::unique_ptr<ASTBlock> parseBlock();
 
@@ -84,4 +88,6 @@ private:
     std::unique_ptr<Lexer> Lexer;
 
     std::vector<std::unique_ptr<ASTNode>> ASTNodes;
+
+    std::string Err;
 };

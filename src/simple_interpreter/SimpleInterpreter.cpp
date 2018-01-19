@@ -7,6 +7,8 @@
 #include "../parser/ast/ASTFunction.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
 #include "../parser/ast/ASTExpressionNumber.h"
+#include "../parser/ast/ASTStatement.h"
+#include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTBlock.h"
 
 SimpleInterpreter::SimpleInterpreter(::Module* mod)
@@ -87,7 +89,12 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 }
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
+    std::cout << "[SimInt] Visiting an ASTExpressionNumber" << std::endl;
     CurValue = std::make_shared<ValueNumber>(num->getValue());
+}
+
+void SimpleInterpreter::visit(ASTExpressionVariable* var) {
+    std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
@@ -98,12 +105,22 @@ void SimpleInterpreter::visit(ASTBlock* block) {
     }
 }
 
-void SimpleInterpreter::visit(ASTStatementDecl* decl) {
-    std::cout << "[SimInt] Visiting a declaration" << std::endl;
+void SimpleInterpreter::visit(ASTStatementAssign* assign) {
+    std::cout << "[SimInt] Visiting an assignment" << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTStatementCall* call) {
     std::cout << "[SimInt] Visiting a call" << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTStatementDecl* decl) {
+    std::cout << "[SimInt] Visiting a declaration" << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTStatementExpr* expr) {
+    std::cout << "[SimInt] Visiting an ASTStatementExpr" << std::endl;
+
+    expr->getExpr()->accept(this);
 }
 
 void SimpleInterpreter::interpret() {

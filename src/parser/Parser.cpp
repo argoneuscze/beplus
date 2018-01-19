@@ -9,10 +9,8 @@ Parser::Parser(std::istream& input) {
     Lexer = std::make_unique<::Lexer>(input);
 }
 
-// TODO Change parse() to return a Module
 // TODO more possible parsing options? toplevelstatement?
 std::unique_ptr<Module> Parser::parse() {
-    std::string err; // have to declare before switch
     LogDebug("Parsing started");
 
     // read first token
@@ -21,7 +19,6 @@ std::unique_ptr<Module> Parser::parse() {
     try {
         while (true) {
             switch (Lexer->getCurToken()) {
-                // TODO more tokens
             case TokenType::KW_SEMICOLON:
                 LogDebug("Found stray ';', skipping");
                 Lexer->readNextToken();
@@ -34,9 +31,8 @@ std::unique_ptr<Module> Parser::parse() {
                 LogDebug("EOF encountered");
                 return std::make_unique<Module>(std::move(ASTNodes));
             case TokenType::INVALID_TOK:
-                // LogDebug("Invalid token found"); // no need to logdebug
-                err = "Invalid token found: " + Lexer->getStrValue();
-                throw ParserException(err);
+                Err = "Invalid token found: " + Lexer->getCurSymbol();
+                throw ParserException(Err);
             default:
                 LogDebug("Parsing top level expression");
                 handleTopLevelExpression();
@@ -51,20 +47,30 @@ std::unique_ptr<Module> Parser::parse() {
     return nullptr;
 }
 
-void Parser::handleTopLevelExpression() {
+/*void Parser::handleTopLevelExpression() {
     auto expr = parseExpression();
 
     LogDebug(expr.get());
 
     if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-        std::string err = "Expected a ';' at the end of an expression, \
+        Err = "Expected a ';' at the end of an expression, \
 instead got " + Lexer->getStrValue();
-        throw ParserException(err);
+        throw ParserException(Err);
     }
 
     Lexer->readNextToken(); // eat ';'
 
     ASTNodes.push_back(std::move(expr));
+}*/
+
+// Not checking a ';' at the end of a statement as that's handled
+// by the parsing functions.
+void Parser::handleTopLevelExpression() {
+    auto stmt = parseStatement();
+    
+    LogDebug(stmt.get());
+
+    ASTNodes.push_back(std::move(stmt));
 }
 
 int Parser::getTokPrecedence() const {
@@ -81,17 +87,30 @@ std::unique_ptr<ASTExpression> Parser::parseExpression() {
     return parseBinOpRHS(0, std::move(primary));
 }
 
+/* Important case: a + 2; OR a;
+ * A statement had to decide this is an expression at the binary op.
+ * Thus, when it got to this point, curToken is actually '+'
+ * and it is necessary to build the binary operator expression
+ * from this point - not possible to call parseVariableExpression()
+ * due to it eating the current token which we do not want.
+ * Fortunately enough, Lexer's StrValue holds an identifier, not
+ * the current symbol.
+ */
 std::unique_ptr<ASTExpression> Parser::parsePrimary() {
     switch (Lexer->getCurToken()) {
     case TokenType::NUMBER:
         return parseNumberExpression();
     case TokenType::KW_LEFTBRACKET:
         return parseParenthesisExpression();
-        // TODO more token types
+    case TokenType::IDENTIFIER:
+        return parseVariableExpression();
+    case TokenType::KW_BINARYOP:
+    case TokenType::KW_SEMICOLON:
+        return parseBinOpRHS(0, std::make_unique<ASTExpressionVariable>(Lexer->getStrValue()));
     default:
-        std::string err = "Unknown token " + Lexer->getStrValue() + " found \
+        Err = "Unknown token " + Lexer->getCurSymbol() + " found \
 when parsing expression.";
-        throw ParserException(err);
+        throw ParserException(Err);
     }
 }
 
@@ -125,6 +144,14 @@ std::unique_ptr<ASTExpressionNumber> Parser::parseNumberExpression() {
     return num;
 }
 
+std::unique_ptr<ASTExpressionVariable> Parser::parseVariableExpression(void) {
+    LogDebug("Parsing variable expression");
+
+    auto var = std::make_unique<ASTExpressionVariable>(Lexer->getStrValue());
+    Lexer->readNextToken(); // eat ident
+    return var;
+}
+
 std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
     LogDebug("Parsing a parenthesis expression");
 
@@ -133,8 +160,8 @@ std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
     auto expr = parseExpression();
 
     if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
-        std::string err = "Expected ')', instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected ')', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat ')'
 
@@ -148,8 +175,8 @@ void Parser::handleFunction() {
     auto proto = parsePrototype();
 
     if (Lexer->getCurToken() != TokenType::KW_LEFTCURLYBRACKET) {
-        std::string err = "Expected '{', instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected '{', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat '{'
 
@@ -157,8 +184,8 @@ void Parser::handleFunction() {
     auto block = parseBlock();
 
     if (Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
-        std::string err = "Expected '}', instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected '}', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat '}'
 
@@ -175,8 +202,8 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
     Lexer->readNextToken(); // eat identifier
 
     if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
-        std::string err = "Expected '(', instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected '(', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat '('
 
@@ -184,14 +211,14 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
     Lexer->readNextToken(); // eat ')'
 
     if (Lexer->getCurToken() != TokenType::KW_COLON) {
-        std::string err = "Expected ':', instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected ':', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat ':'
 
     if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
-        std::string err = "Expected datatype, instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected datatype, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     auto type = Lexer->getDataType();
     Lexer->readNextToken(); // eat datatype
@@ -201,7 +228,6 @@ std::unique_ptr<ASTFunctionPrototype> Parser::parsePrototype() {
 
 // arguments ::= datatype identifier ',' | ')'
 std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
-    std::string err;
     LogDebug("Parsing prototype arguments");
 
     std::vector<std::unique_ptr<ASTArgument>> args;
@@ -231,23 +257,22 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
         case TokenType::KW_RIGHTBRACKET:
             return args;
         default:
-            err = "Expected ',' or ')', instead got: " + Lexer->getStrValue();
-            throw ParserException(err);
+            Err = "Expected ',' or ')', instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
         }
     }
 }
 
 // DECL ::= DATATYPE IDENT
 std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
-    std::string err;
     LogDebug("Parsing a declaration");
 
     auto type = Lexer->getDataType(); // datatype already checked by caller
     Lexer->readNextToken(); // eat DATATYPE
 
     if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
-        err = "Expected an identifier, instead got: " + Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected an identifier, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
 
     std::string ident = Lexer->getStrValue();
@@ -262,7 +287,6 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
 // possible TODO - check the module whether the function prototype actually
 //                 exists and can be satisfied with this call?
 std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
-    std::string err;
     LogDebug("Parsing a call");
 
     std::vector<std::unique_ptr<ASTExpression>> args;
@@ -284,12 +308,23 @@ std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
             Lexer->readNextToken(); // eat ')'
             return std::make_unique<ASTStatementCall>(ident, std::move(args));
         default:
-            err = "Expected ',' or ')', instead got: " + Lexer->getStrValue();
-            throw ParserException(err);
+            Err = "Expected ',' or ')', instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
         }
     }
 
     throw ParserException("parseCall() should never get here.");
+}
+
+// ASSIGN ::= '=' EXPR
+std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string ident) {
+    LogDebug("Parsing an assignment");
+
+    Lexer->readNextToken(); // eat '='
+
+    auto expr = parseExpression();
+
+    return std::make_unique<ASTStatementAssign>(ident, std::move(expr));
 }
 
 // TODO implement all possible statements
@@ -301,29 +336,42 @@ std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
 // is necessary inside of the if block.
 std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     LogDebug("Parsing a statement");
-    std::string err;
     std::unique_ptr<ASTStatement> stmt;
 
     // DECL ::= DATATYPE IDENT ';'
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
     }
-        // CALL ::= IDENT '('
-        // ASSIGN ::= IDENT '='
-        // EXPR ::= IDENT BINOP
+    // CALL ::= IDENT '('
+    // ASSIGN ::= IDENT '='
+    // EXPR ::= IDENT BINOP* (default behaviour)
     else if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
         std::string ident = Lexer->getStrValue();
         Lexer->readNextToken(); // eat IDENT
         if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
             stmt = parseCall(ident);
-        // TODO else if other statements starting with ident ...
+        else if (Lexer->getCurToken() == TokenType::KW_EQUALITYOP) {
+            stmt = parseAssignment(ident);
+        }
+        else { // Necessary to check that we're not parsing IDENT IDENT
+            if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
+                throw ParserException("Did not expect an identifier after an identifier.");
+            }
+            auto expr = parseExpression();
+            stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
+        }
     }
-    // TODO else if other statements ...
+    // EXPR ::= NUMBER BINOP*
+    // ANYTHING ::= EXPR (basically last resort, e.g. starting with '(')
+    else if (Lexer->getCurToken() == TokenType::NUMBER) {
+        auto expr = parseExpression();
+        stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
+    }
 
     if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-        err = "Expected ';' at the end of a statement, instead got: " +
-            Lexer->getStrValue();
-        throw ParserException(err);
+        Err = "Expected ';' at the end of a statement, instead got: " +
+            Lexer->getCurSymbol();
+        throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat ';'
 

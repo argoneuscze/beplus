@@ -22,6 +22,7 @@ TokenType Lexer::getTok() {
         while (isalnum(LastChar = reader.get()))
             StrValue += LastChar;
 
+        CurSymbol = StrValue;
         auto LowerCase = StrValue;
         for (size_t i = 0; i < LowerCase.size(); ++i)
             LowerCase[i] = tolower(StrValue[i]);
@@ -71,6 +72,7 @@ TokenType Lexer::getTok() {
         while (isdigit(LastChar = reader.get()))
             StrValue += LastChar;
         NumValue = stol(StrValue);
+        CurSymbol = StrValue;
         return TokenType::NUMBER;
     }
 
@@ -89,8 +91,7 @@ TokenType Lexer::getTok() {
         return TokenType::EOFTOK;
 
     auto ThisChar = LastChar;
-    StrValue.clear();
-    StrValue += ThisChar; // mostly for debug purposes
+    CurSymbol = ThisChar;;
     LastChar = reader.get();
     switch (ThisChar) {
     case '(':
@@ -111,6 +112,8 @@ TokenType Lexer::getTok() {
         return TokenType::KW_COLON;
     case ',':
         return TokenType::KW_COMMA;
+    case '=':
+        return TokenType::KW_EQUALITYOP;
     case '+':
         BinValue = BinOp::OP_ADD;
         return TokenType::KW_BINARYOP;
@@ -144,6 +147,10 @@ bool Lexer::getBoolValue() const {
 
 std::string Lexer::getStrValue() const {
     return this->StrValue;
+}
+
+std::string Lexer::getCurSymbol() const {
+    return this->CurSymbol;
 }
 
 DataType Lexer::getDataType() const {

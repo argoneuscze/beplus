@@ -35,9 +35,12 @@ public:
     void visit(ASTArgument* arg) override;
     void visit(ASTExpressionBinOp* binOp) override;
     void visit(ASTExpressionNumber* num) override;
+    void visit(ASTExpressionVariable* var) override;
     void visit(ASTBlock* block) override;
-    void visit(ASTStatementDecl* decl) override;
+    void visit(ASTStatementAssign* assign) override;
     void visit(ASTStatementCall* call) override;
+    void visit(ASTStatementDecl* decl) override;
+    void visit(ASTStatementExpr* expr) override;
 
 private:
     std::unique_ptr<Environment> GlobalEnv;
