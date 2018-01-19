@@ -5,12 +5,8 @@
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {
 }
 
-void Environment::addVariable(std::string& name, std::shared_ptr<Value> value) {
-    Variables.insert(std::make_pair(name, value));
-}
-
-void Environment::removeVariable(std::string& name) {
-    Variables.erase(name);
+void Environment::setVariable(std::string& name, const std::shared_ptr<Value>& value) {
+    Variables[name] = value;
 }
 
 std::shared_ptr<Value> Environment::getVariable(std::string& name) {

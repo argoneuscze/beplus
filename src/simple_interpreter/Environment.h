@@ -10,10 +10,8 @@ class Environment {
 public:
     explicit Environment(Environment* prevEnv);
 
-    // adds a new variable to the environment
-    void addVariable(std::string& name, std::shared_ptr<Value> value);
-    // removes a variable from the environment
-    void removeVariable(std::string& name);
+    // sets a new variable in the environment
+    void setVariable(std::string& name, const std::shared_ptr<Value>& value);
     // gets a shared pointer to a variable
     std::shared_ptr<Value> getVariable(std::string& name);
 
