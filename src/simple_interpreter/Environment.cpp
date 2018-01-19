@@ -12,9 +12,8 @@ void Environment::setVariable(std::string& name, const std::shared_ptr<Value>& v
 std::shared_ptr<Value> Environment::getVariable(std::string& name) {
     const auto val = Variables.find(name);
     // check if current environment has variable
-    if (val != Variables.end()) {
+    if (val != Variables.end())
         return val->second;
-    }
     // value not found, check parents, if exist
     // return nullptr if no parent
     if (!PrevEnv)
