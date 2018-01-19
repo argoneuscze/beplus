@@ -44,7 +44,7 @@ private:
     Environment* CurEnv;
 
     Module* const Module;
-    std::unique_ptr<Value> CurValue;
+    std::shared_ptr<Value> CurValue;
 
     void interpret();
 };

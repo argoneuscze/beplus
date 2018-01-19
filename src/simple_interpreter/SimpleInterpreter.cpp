@@ -55,12 +55,12 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 
     // evaluate left side
     binOp->getLHS()->accept(this);
-    const auto val1_ptr = std::move(CurValue);
+    const auto val1_ptr = CurValue;
     const auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     // evaluate right side
     binOp->getRHS()->accept(this);
-    const auto val2_ptr = std::move(CurValue);
+    const auto val2_ptr = CurValue;
     const auto val2 = dynamic_cast<ValueNumber*>(val2_ptr.get());
 
     assert(val1 != nullptr && val2 != nullptr);
@@ -68,16 +68,16 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
     // calculate the result and store it
     switch (op) {
     case BinOp::OP_ADD:
-        CurValue = std::make_unique<ValueNumber>(val1->getValue() + val2->getValue());
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() + val2->getValue());
         break;
     case BinOp::OP_SUB:
-        CurValue = std::make_unique<ValueNumber>(val1->getValue() - val2->getValue());
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() - val2->getValue());
         break;
     case BinOp::OP_MUL:
-        CurValue = std::make_unique<ValueNumber>(val1->getValue() * val2->getValue());
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() * val2->getValue());
         break;
     case BinOp::OP_DIV:
-        CurValue = std::make_unique<ValueNumber>(val1->getValue() / val2->getValue());
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() / val2->getValue());
         break;
     default:
         break;
@@ -87,7 +87,7 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 }
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
-    CurValue = std::make_unique<ValueNumber>(num->getValue());
+    CurValue = std::make_shared<ValueNumber>(num->getValue());
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
