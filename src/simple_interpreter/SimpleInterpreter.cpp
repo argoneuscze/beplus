@@ -9,6 +9,7 @@
 #include "../parser/ast/ASTExpressionNumber.h"
 #include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
+#include "../parser/ast/ASTStatementAssign.h"
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTBlock.h"
@@ -18,11 +19,18 @@ SimpleInterpreter::SimpleInterpreter(::Module* mod)
     interpret();
 }
 
-void SimpleInterpreter::visit(::Module* module) {
-    std::cout << "[SimInt] Visiting Module" << std::endl;
+SimpleInterpreter::SimpleInterpreter(void) : Module(nullptr) {
+    std::cout << "[SimInt] Empty constructor called" << std::endl;
 
     GlobalEnv = std::make_unique<Environment>(nullptr);
     CurEnv = GlobalEnv.get();
+}
+
+void SimpleInterpreter::visit(::Module* module) {
+    std::cout << "[SimInt] Visiting Module" << std::endl;
+
+    //GlobalEnv = std::make_unique<Environment>(nullptr);
+    //CurEnv = GlobalEnv.get();
 
     for (auto& node : *module->getNodes()) {
         node->accept(this);
@@ -87,7 +95,7 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
         break;
     }
 
-    std::cout << "Result: " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
+    std::cout << "[SimInt] Result: " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
@@ -98,7 +106,7 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
     auto val = CurEnv->getVariable(var->getName());
-    //std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(val.get()) << std::endl;
+    std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(val.get())->getValue() << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
@@ -111,6 +119,11 @@ void SimpleInterpreter::visit(ASTBlock* block) {
 
 void SimpleInterpreter::visit(ASTStatementAssign* assign) {
     std::cout << "[SimInt] Visiting an assignment" << std::endl;
+    const auto name = assign->getName();
+    assign->getExpr()->accept(this);
+    const auto val_ptr = CurValue;
+
+    CurEnv->setVariable(name, val_ptr);
 }
 
 void SimpleInterpreter::visit(ASTStatementCall* call) {
@@ -120,7 +133,7 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
 
-    CurEnv->setVariable(decl->getIdent(), std::make_shared<ValueNumber>(101)); 
+    CurEnv->setVariable(decl->getIdent(), std::make_shared<ValueNumber>(0)); 
 }
 
 void SimpleInterpreter::visit(ASTStatementExpr* expr) {
@@ -132,6 +145,15 @@ void SimpleInterpreter::visit(ASTStatementExpr* expr) {
 void SimpleInterpreter::interpret() {
     try {
         Module->accept(this);
+    }
+    catch (InterpreterException& ex) {
+        std::cout << "InterpreterException: " << ex.what() << std::endl;
+    }
+}
+
+void SimpleInterpreter::interpretModule(::Module* module) {
+    try {
+        module->accept(this);
     }
     catch (InterpreterException& ex) {
         std::cout << "InterpreterException: " << ex.what() << std::endl;

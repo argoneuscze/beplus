@@ -7,6 +7,8 @@
 #include "simple_interpreter/SimpleInterpreter.h"
 
 void startREPL() {
+    auto interpreter = std::make_unique<SimpleInterpreter>();
+
     while (true) {
         // READ
         std::cout << "beplus> ";
@@ -22,6 +24,7 @@ void startREPL() {
         if (!module)
             continue;
 
-        auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
+        interpreter->interpretModule(module.get());
+        //auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
     }
 }

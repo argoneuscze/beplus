@@ -15,6 +15,10 @@ public:
         return VarName;
     }
 
+    ASTExpression* getExpr(void) const {
+        return Expr.get();
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementAssign into var: " << VarName;

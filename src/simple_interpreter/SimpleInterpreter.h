@@ -28,6 +28,9 @@ private:
 class SimpleInterpreter : public Visitor {
 public:
     explicit SimpleInterpreter(Module* mod);
+    explicit SimpleInterpreter(void);
+
+    void interpretModule(Module* module);
 
     void visit(Module* module) override;
     void visit(ASTFunction* func) override;
