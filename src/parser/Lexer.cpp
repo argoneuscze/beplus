@@ -91,9 +91,15 @@ TokenType Lexer::getTok() {
         return TokenType::EOFTOK;
 
     auto ThisChar = LastChar;
-    CurSymbol = ThisChar;;
+    CurSymbol = ThisChar;
     LastChar = reader.get();
     switch (ThisChar) {
+    case '!':
+        if (LastChar == '=') { // '!=' instead of an unary NOT
+            LastChar = reader.get();
+            BinValue = BinOp::OP_NEQL;
+            return TokenType::KW_BINARYOP;
+        }
     case '(':
         return TokenType::KW_LEFTBRACKET;
     case ')':
@@ -113,7 +119,28 @@ TokenType Lexer::getTok() {
     case ',':
         return TokenType::KW_COMMA;
     case '=':
-        return TokenType::KW_EQUALITYOP;
+        if (LastChar == '=') { // '==' instead of '='
+            LastChar = reader.get();
+            BinValue = BinOp::OP_EQL;
+            return TokenType::KW_BINARYOP;
+        }
+        return TokenType::KW_ASSIGNOP;
+    case '<':
+        if (LastChar == '=') { // '<= instead of '<'
+            LastChar = reader.get();
+            BinValue = BinOp::OP_LTE;
+            return TokenType::KW_BINARYOP;
+        }
+        BinValue = BinOp::OP_LT;
+        return TokenType::KW_BINARYOP;
+    case '>':
+        if (LastChar == '=') { // '>=' instead of '<'
+            LastChar = reader.get();
+            BinValue = BinOp::OP_GTE;
+            return TokenType::KW_BINARYOP;
+        }
+        BinValue = BinOp::OP_GT;
+        return TokenType::KW_BINARYOP;
     case '+':
         BinValue = BinOp::OP_ADD;
         return TokenType::KW_BINARYOP;

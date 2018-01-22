@@ -38,6 +38,7 @@ private:
     std::string msg;
 };
 
+// table made according to: http://en.cppreference.com/w/c/language/operator_precedence
 class BinOpPrecedence {
 public:
     BinOpPrecedence() {
@@ -46,6 +47,12 @@ public:
             {BinOp::OP_SUB, 20},
             {BinOp::OP_MUL, 40},
             {BinOp::OP_DIV, 40},
+            {BinOp::OP_EQL, 10},
+            {BinOp::OP_NEQL, 10},
+            {BinOp::OP_LT, 15},
+            {BinOp::OP_LTE, 15},
+            {BinOp::OP_GT, 15},
+            {BinOp::OP_GTE, 15},
         };
     }
 

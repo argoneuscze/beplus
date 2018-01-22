@@ -23,7 +23,7 @@ enum class TokenType {
     KW_COLON,
     KW_COMMA,
     KW_BINARYOP,
-    KW_EQUALITYOP,
+    KW_ASSIGNOP,
 
     // user-defined
     IDENTIFIER,
@@ -46,7 +46,13 @@ enum class BinOp {
     OP_ADD,
     OP_SUB,
     OP_MUL,
-    OP_DIV
+    OP_DIV,
+    OP_EQL,
+    OP_NEQL,
+    OP_LT,
+    OP_LTE, // less than / equal
+    OP_GT,
+    OP_GTE // greater than / equal
 };
 
 class Lexer {
