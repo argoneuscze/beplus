@@ -87,8 +87,10 @@ TokenType Lexer::getTok() {
             return getTok();
     }
 
-    if (LastChar == EOF)
+    if (LastChar == EOF) {
+        CurSymbol = "EOF"; // set to "EOF" just for better error messages
         return TokenType::EOFTOK;
+    }
 
     auto ThisChar = LastChar;
     CurSymbol = ThisChar;

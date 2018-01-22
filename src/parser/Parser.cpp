@@ -328,8 +328,7 @@ std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string id
 // TODO finish parsing elsif/else blocks
 // TODO if ( EXPR+ ) or if ( EXPR )? should only be EXPR as || && operators
 // and such are simple binary operators?
-std::unique_ptr<ASTStatementIf> Parser::parseIf(void)
-{
+std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
     LogDebug("Parsing an if statement");
 
     Lexer->readNextToken(); // eat 'if'
@@ -353,11 +352,37 @@ std::unique_ptr<ASTStatementIf> Parser::parseIf(void)
     return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt));
 }
 
+// WHILE ::= 'while' '(' EXPR ')' STMT
+std::unique_ptr<ASTStatementWhile> Parser::parseWhile(void) {
+    LogDebug("Parsing a while statement");
+
+    Lexer->readNextToken(); // eat 'while'
+
+    if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
+        Err = "Expected a '(' after a while, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat '('
+
+    auto expr = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
+        Err = "Expected a ')' at the end of a while statement, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ')'
+
+    auto stmt = parseStatement();
+
+    return std::make_unique<ASTStatementWhile>(std::move(expr), std::move(stmt));
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
 // statement ::= EXPR ';'
 // statament ::= IF
+// statement ::= WHILE
 // statement ::= BLOCK TODO
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
@@ -372,6 +397,11 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // IF ::= 'if'
     else if (Lexer->getCurToken() == TokenType::KW_IF) {
         stmt = parseIf();
+        return stmt; // does not end with an ';', no need to keep going
+    }
+    // WHILE ::= 'while'
+    else if (Lexer->getCurToken() == TokenType::KW_WHILE) {
+        stmt = parseWhile();
         return stmt; // does not end with an ';', no need to keep going
     }
     // CALL ::= IDENT '('

@@ -14,6 +14,7 @@
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTStatementIf.h"
+#include "../parser/ast/ASTStatementWhile.h"
 #include "../parser/ast/ASTBlock.h"
 
 SimpleInterpreter::SimpleInterpreter(::Module* mod)
@@ -174,6 +175,19 @@ void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
 
     if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue())
         ifStmt->getCondExec()->accept(this);
+}
+
+void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {
+    std::cout << "[SimInt] Visiting a while statement" << std::endl;
+
+    while (true) {
+        whileStmt->getCond()->accept(this);
+
+        if (!(dynamic_cast<ValueNumber*>(CurValue.get())->getValue()))
+            break;
+
+        whileStmt->getStatement()->accept(this);
+    }
 }
 
 void SimpleInterpreter::interpret() {
