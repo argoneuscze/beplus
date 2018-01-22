@@ -13,6 +13,7 @@ class ASTStatementCall;
 class ASTStatementCallBuiltin;
 class ASTStatementDecl;
 class ASTStatementExpr;
+class ASTStatementIf;
 
 class Visitor {
 public:
@@ -36,6 +37,7 @@ public:
     virtual void visit(ASTStatementCallBuiltin* call) = 0;
     virtual void visit(ASTStatementDecl* decl) = 0;
     virtual void visit(ASTStatementExpr* expr) = 0;
+    virtual void visit(ASTStatementIf* ifStmt) = 0;
 };
 
 class Visitable {

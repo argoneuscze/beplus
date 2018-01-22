@@ -45,6 +45,7 @@ public:
     void visit(ASTStatementCallBuiltin* call) override;
     void visit(ASTStatementDecl* decl) override;
     void visit(ASTStatementExpr* expr) override;
+    void visit(ASTStatementIf* ifStmt) override;
 
 private:
     void builtinPrint(ASTStatementCallBuiltin* call);

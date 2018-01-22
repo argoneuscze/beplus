@@ -324,20 +324,55 @@ std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string id
     return std::make_unique<ASTStatementAssign>(ident, std::move(expr));
 }
 
-// TODO implement all possible statements
+// IF ::= 'if' '(' EXPR ')' STMT ('elsif' STMT)* ('else' STMT)*
+// TODO finish parsing elsif/else blocks
+// TODO if ( EXPR+ ) or if ( EXPR )? should only be EXPR as || && operators
+// and such are simple binary operators?
+std::unique_ptr<ASTStatementIf> Parser::parseIf(void)
+{
+    LogDebug("Parsing an if statement");
+
+    Lexer->readNextToken(); // eat 'if'
+
+    if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
+        Err = "Expected a '(' after an if, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat '('
+
+    auto expr = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
+        Err = "Expected a ')' at the end of an if statement, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ')'
+
+    auto stmt = parseStatement();
+
+    return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt));
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
 // statement ::= EXPR ';'
+// statament ::= IF
+// statement ::= BLOCK TODO
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
 std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     LogDebug("Parsing a statement");
     std::unique_ptr<ASTStatement> stmt;
 
-    // DECL ::= DATATYPE IDENT ';'
+    // DECL ::= DATATYPE IDENT
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
+    }
+    // IF ::= 'if'
+    else if (Lexer->getCurToken() == TokenType::KW_IF) {
+        stmt = parseIf();
+        return stmt; // does not end with an ';', no need to keep going
     }
     // CALL ::= IDENT '('
     // ASSIGN ::= IDENT '='
