@@ -47,6 +47,8 @@ public:
     void visit(ASTStatementExpr* expr) override;
 
 private:
+    void builtinPrint(ASTStatementCallBuiltin* call);
+
     std::unique_ptr<Environment> GlobalEnv;
     Environment* CurEnv;
 

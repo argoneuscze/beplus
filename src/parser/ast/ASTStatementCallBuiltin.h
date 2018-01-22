@@ -10,6 +10,14 @@ public:
         v->visit(this);
     }
 
+    const std::string & getName(void) const {
+        return FnName;
+    }
+
+    const std::vector<std::unique_ptr<ASTExpression>>* getArgs(void) const {
+        return &Args;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementCallBuiltin to " << FnName;

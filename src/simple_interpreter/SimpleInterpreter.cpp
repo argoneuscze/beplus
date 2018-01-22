@@ -10,6 +10,7 @@
 #include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
 #include "../parser/ast/ASTStatementAssign.h"
+#include "../parser/ast/ASTStatementCallBuiltin.h"
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTBlock.h"
@@ -132,6 +133,8 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 
 void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {
     std::cout << "[SimInt] Visiting a builtin call" << std::endl;
+    if (call->getName() == "print")
+        builtinPrint(call);
 }
 
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
@@ -152,6 +155,15 @@ void SimpleInterpreter::interpret() {
     }
     catch (InterpreterException& ex) {
         std::cout << "InterpreterException: " << ex.what() << std::endl;
+    }
+}
+
+void SimpleInterpreter::builtinPrint(ASTStatementCallBuiltin* call) {
+    std::cout << "[SimInt] Executing builtin print()" << std::endl;
+
+    for (auto& arg : *(call->getArgs())) {
+        arg->accept(this);
+        std::cout << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
     }
 }
 
