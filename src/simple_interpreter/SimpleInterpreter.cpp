@@ -79,6 +79,8 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
     const auto val2_ptr = CurValue;
     const auto val2 = dynamic_cast<ValueNumber*>(val2_ptr.get());
 
+    std::cout << "[SimInt] Calculating binop, LHS: " << val1->getValue() << " RHS: " << val2->getValue() << std::endl;
+
     assert(val1 != nullptr && val2 != nullptr);
 
     // calculate the result and store it
@@ -127,8 +129,8 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
-    auto val = CurEnv->getVariable(var->getName());
-    std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(val.get())->getValue() << std::endl;
+    CurValue = CurEnv->getVariable(var->getName());
+    std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
