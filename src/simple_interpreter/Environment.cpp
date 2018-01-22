@@ -6,6 +6,7 @@
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {
 }
 
+// TODO resolve which environment to set the variable in!
 void Environment::setVariable(const std::string & name, const std::shared_ptr<Value> value) {
     std::cout << "[Env] Setting " << name << std::endl;
     Variables[name] = value;

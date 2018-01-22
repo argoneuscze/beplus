@@ -377,6 +377,21 @@ std::unique_ptr<ASTStatementWhile> Parser::parseWhile(void) {
     return std::make_unique<ASTStatementWhile>(std::move(expr), std::move(stmt));
 }
 
+// BLOCK ::= '{' STMT* '}'
+std::unique_ptr<ASTStatementBlock> Parser::parseBlockStatement(void) {
+    LogDebug("Parsing a block statement");
+
+    Lexer->readNextToken(); // eat '{'
+
+    auto block = parseBlock();
+
+    // It is not necessary to check the presence of '}' as that is the
+    // terminating rule of the parseBlock() function.
+    Lexer->readNextToken(); // eat '}'
+
+    return std::make_unique<ASTStatementBlock>(std::move(block));
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
@@ -403,6 +418,11 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     else if (Lexer->getCurToken() == TokenType::KW_WHILE) {
         stmt = parseWhile();
         return stmt; // does not end with an ';', no need to keep going
+    }
+    // BLOCK ::= '{'
+    else if (Lexer->getCurToken() == TokenType::KW_LEFTCURLYBRACKET) {
+        stmt = parseBlockStatement();
+        return stmt;
     }
     // CALL ::= IDENT '('
     // ASSIGN ::= IDENT '='

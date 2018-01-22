@@ -10,6 +10,7 @@
 #include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
 #include "../parser/ast/ASTStatementAssign.h"
+#include "../parser/ast/ASTStatementBlock.h"
 #include "../parser/ast/ASTStatementCallBuiltin.h"
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
@@ -145,6 +146,12 @@ void SimpleInterpreter::visit(ASTStatementAssign* assign) {
     const auto val_ptr = CurValue;
 
     CurEnv->setVariable(name, val_ptr);
+}
+
+void SimpleInterpreter::visit(ASTStatementBlock* block) {
+    std::cout << "[SimInt] Visiting a block statement" << std::endl;
+
+    block->getBlock()->accept(this);
 }
 
 void SimpleInterpreter::visit(ASTStatementCall* call) {
