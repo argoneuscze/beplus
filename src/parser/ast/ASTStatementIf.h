@@ -9,6 +9,14 @@ public:
         v->visit(this);
     }
 
+    ASTExpression * getCond(void) {
+        return Cond.get();
+    }
+
+    ASTStatement * getCondExec(void) {
+        return CondExec.get();
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementIf";

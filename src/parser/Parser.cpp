@@ -382,7 +382,7 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
         Lexer->readNextToken(); // eat IDENT
         if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
             stmt = parseCall(ident);
-        else if (Lexer->getCurToken() == TokenType::KW_EQUALITYOP) {
+        else if (Lexer->getCurToken() == TokenType::KW_EQUALITYOP) { // TODO rename to ASSIGNOP
             stmt = parseAssignment(ident);
         }
         else { // Necessary to check that we're not parsing IDENT IDENT
