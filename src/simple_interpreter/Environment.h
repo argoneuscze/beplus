@@ -10,7 +10,9 @@ class Environment {
 public:
     explicit Environment(Environment* prevEnv);
 
-    // sets a new variable in the environment
+    // inits a new variable in the environment
+    bool initVariable(const std::string & name, const std::shared_ptr<Value> value);
+    // sets a variable in the environment
     bool setVariable(const std::string & name, const std::shared_ptr<Value> value);
     // gets a shared pointer to a variable
     std::shared_ptr<Value> getVariable(const std::string & name);

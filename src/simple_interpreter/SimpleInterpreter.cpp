@@ -168,7 +168,8 @@ void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
 
-    CurEnv->setVariable(decl->getIdent(), std::make_shared<ValueNumber>(0)); 
+    if(!CurEnv->initVariable(decl->getIdent(), std::make_shared<ValueNumber>(0)))
+        throw InterpreterException("Unable to initialize variable.");
 }
 
 void SimpleInterpreter::visit(ASTStatementExpr* expr) {
