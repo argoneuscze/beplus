@@ -10,6 +10,7 @@ class ASTExpressionVariable;
 class ASTBlock;
 class ASTStatementAssign;
 class ASTStatementCall;
+class ASTStatementCallBuiltin;
 class ASTStatementDecl;
 class ASTStatementExpr;
 
@@ -32,6 +33,7 @@ public:
     virtual void visit(ASTBlock* block) = 0;
     virtual void visit(ASTStatementAssign* assign) = 0;
     virtual void visit(ASTStatementCall* call) = 0;
+    virtual void visit(ASTStatementCallBuiltin* call) = 0;
     virtual void visit(ASTStatementDecl* decl) = 0;
     virtual void visit(ASTStatementExpr* expr) = 0;
 };

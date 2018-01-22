@@ -130,6 +130,10 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
     std::cout << "[SimInt] Visiting a call" << std::endl;
 }
 
+void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {
+    std::cout << "[SimInt] Visiting a builtin call" << std::endl;
+}
+
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
 

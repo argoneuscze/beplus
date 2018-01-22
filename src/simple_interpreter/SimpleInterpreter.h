@@ -42,6 +42,7 @@ public:
     void visit(ASTBlock* block) override;
     void visit(ASTStatementAssign* assign) override;
     void visit(ASTStatementCall* call) override;
+    void visit(ASTStatementCallBuiltin* call) override;
     void visit(ASTStatementDecl* decl) override;
     void visit(ASTStatementExpr* expr) override;
 

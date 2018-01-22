@@ -9,6 +9,15 @@ Parser::Parser(std::istream& input) {
     Lexer = std::make_unique<::Lexer>(input);
 }
 
+bool Parser::functionBuiltin(const std::string & name) {
+    if (name == "print")
+        return true;
+    if (name == "read")
+        return true;
+
+    return false;
+}
+
 // TODO more possible parsing options? toplevelstatement?
 std::unique_ptr<Module> Parser::parse() {
     LogDebug("Parsing started");
@@ -34,8 +43,8 @@ std::unique_ptr<Module> Parser::parse() {
                 Err = "Invalid token found: " + Lexer->getCurSymbol();
                 throw ParserException(Err);
             default:
-                LogDebug("Parsing top level expression");
-                handleTopLevelExpression();
+                LogDebug("Parsing top level statement");
+                handleTopLevelStatement();
                 break;
             }
         }
@@ -47,25 +56,9 @@ std::unique_ptr<Module> Parser::parse() {
     return nullptr;
 }
 
-/*void Parser::handleTopLevelExpression() {
-    auto expr = parseExpression();
-
-    LogDebug(expr.get());
-
-    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-        Err = "Expected a ';' at the end of an expression, \
-instead got " + Lexer->getStrValue();
-        throw ParserException(Err);
-    }
-
-    Lexer->readNextToken(); // eat ';'
-
-    ASTNodes.push_back(std::move(expr));
-}*/
-
 // Not checking a ';' at the end of a statement as that's handled
 // by the parsing functions.
-void Parser::handleTopLevelExpression() {
+void Parser::handleTopLevelStatement() {
     auto stmt = parseStatement();
     
     LogDebug(stmt.get());
@@ -286,14 +279,16 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
 // to decide whether the statement really is a function call.
 // possible TODO - check the module whether the function prototype actually
 //                 exists and can be satisfied with this call?
-std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
+std::unique_ptr<ASTStatement> Parser::parseCall(const std::string ident) {
     LogDebug("Parsing a call");
 
     std::vector<std::unique_ptr<ASTExpression>> args;
     Lexer->readNextToken(); // eat '('
 
-    if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET)
+    if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET) {
+        Lexer->readNextToken(); // eat ')'
         return std::make_unique<ASTStatementCall>(ident, std::move(args));
+    }
 
     // ARGS ::= EXPR , EXPR , ...
     while (true) {
@@ -306,6 +301,8 @@ std::unique_ptr<ASTStatementCall> Parser::parseCall(const std::string ident) {
             continue;
         case TokenType::KW_RIGHTBRACKET:
             Lexer->readNextToken(); // eat ')'
+            if (functionBuiltin(ident))
+                return std::make_unique<ASTStatementCallBuiltin>(ident, std::move(args));
             return std::make_unique<ASTStatementCall>(ident, std::move(args));
         default:
             Err = "Expected ',' or ')', instead got: " + Lexer->getCurSymbol();

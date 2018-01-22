@@ -17,6 +17,7 @@
 #include "ast/ASTBlock.h"
 #include "ast/ASTStatementAssign.h"
 #include "ast/ASTStatementCall.h"
+#include "ast/ASTStatementCallBuiltin.h"
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementExpr.h"
 #include "ast/Module.h"
@@ -62,7 +63,8 @@ public:
     std::unique_ptr<Module> parse();
 
 private:
-    void handleTopLevelExpression();
+    bool functionBuiltin(const std::string & name);
+    void handleTopLevelStatement();
     void handleFunction();
 
     static BinOpPrecedence OpPrecedence;
@@ -77,7 +79,7 @@ private:
 
     std::unique_ptr<ASTStatement> parseStatement(void);
     std::unique_ptr<ASTStatementDecl> parseDecl(void);
-    std::unique_ptr<ASTStatementCall> parseCall(std::string ident);
+    std::unique_ptr<ASTStatement> parseCall(std::string ident);
     std::unique_ptr<ASTStatementAssign> parseAssignment(const std::string ident);
 
     std::unique_ptr<ASTBlock> parseBlock();
