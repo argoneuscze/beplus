@@ -6,11 +6,23 @@
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {
 }
 
-// TODO resolve which environment to set the variable in!
-void Environment::setVariable(const std::string & name, const std::shared_ptr<Value> value) {
-    std::cout << "[Env] Setting " << name << std::endl;
-    Variables[name] = value;
+bool Environment::setVariable(const std::string & name, const std::shared_ptr<Value> value) {
     std::cout << "[Env] Variables.size: " << Variables.size() << std::endl;
+
+    const auto val = Variables.find(name);
+
+    if (val != Variables.end()) {
+        std::cout << "[Env] found var " << name << " and setting it." << std::endl;
+        Variables[name] = value;
+        return true;
+    }
+
+    if (!PrevEnv) {
+        std::cout << "[Env] could not find var to be set in Env" << std::endl;
+        return false;
+    }
+
+    return PrevEnv->setVariable(name, value);
 }
 
 std::shared_ptr<Value> Environment::getVariable(const std::string & name) {

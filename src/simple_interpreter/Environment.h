@@ -11,7 +11,7 @@ public:
     explicit Environment(Environment* prevEnv);
 
     // sets a new variable in the environment
-    void setVariable(const std::string & name, const std::shared_ptr<Value> value);
+    bool setVariable(const std::string & name, const std::shared_ptr<Value> value);
     // gets a shared pointer to a variable
     std::shared_ptr<Value> getVariable(const std::string & name);
 

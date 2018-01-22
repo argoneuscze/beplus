@@ -145,7 +145,8 @@ void SimpleInterpreter::visit(ASTStatementAssign* assign) {
     assign->getExpr()->accept(this);
     const auto val_ptr = CurValue;
 
-    CurEnv->setVariable(name, val_ptr);
+    if(!CurEnv->setVariable(name, val_ptr))
+        throw InterpreterException("Could not set a variable to its value.");
 }
 
 void SimpleInterpreter::visit(ASTStatementBlock* block) {
