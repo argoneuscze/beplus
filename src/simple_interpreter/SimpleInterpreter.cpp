@@ -11,6 +11,7 @@
 #include "../parser/ast/ASTStatement.h"
 #include "../parser/ast/ASTStatementAssign.h"
 #include "../parser/ast/ASTStatementBlock.h"
+#include "../parser/ast/ASTStatementCall.h"
 #include "../parser/ast/ASTStatementCallBuiltin.h"
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementExpr.h"
@@ -41,19 +42,19 @@ void SimpleInterpreter::visit(::Module* module) {
     }
 }
 
+// Visiting function node in the parser only leads to saving the function
+// into the function table. Call node takes care of actual calling
+// and dealing with arguments and the block.
 void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
 
-    // create new environment for function
-    CurEnv = CurEnv->fork();
+    auto fn = FunctionTable.find(func->getPrototype()->getName());
+    if (fn != FunctionTable.end()) {
+        std::string err = "Function " + func->getPrototype()->getName() + " already exists in the table.";
+        throw InterpreterException(err);
+    }
 
-    // TODO do stuff with function
-    func->getPrototype()->accept(this);
-    // TODO - push prototype args into env, check their existence ...
-    func->getBlock()->accept(this);
-
-    // restore previous environment
-    CurEnv = CurEnv->restorePrev();
+    FunctionTable[func->getPrototype()->getName()] = std::make_unique<ASTFunction>(std::move(*func));
 }
 
 void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
@@ -159,6 +160,32 @@ void SimpleInterpreter::visit(ASTStatementBlock* block) {
 
 void SimpleInterpreter::visit(ASTStatementCall* call) {
     std::cout << "[SimInt] Visiting a call" << std::endl;
+
+    auto func = FunctionTable.find(call->getName());
+
+    if (func == FunctionTable.end()) {
+        std::string err = "Function " + call->getName() + " not found in the function table.";
+        throw InterpreterException(err);
+    }
+
+    CurEnv = CurEnv->fork();
+
+    func->second->getBlock()->accept(this);
+
+    CurEnv = CurEnv->restorePrev();
+
+    // copypaste from old astfunction
+    // create new environment for function
+    //CurEnv = CurEnv->fork();
+
+    // TODO do stuff with function
+    //func->getPrototype()->accept(this);
+    // TODO - push prototype args into env, check their existence ...
+    //func->getBlock()->accept(this);
+
+    // restore previous environment
+    //CurEnv = CurEnv->restorePrev();
+
 }
 
 void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {

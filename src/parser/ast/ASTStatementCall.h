@@ -19,6 +19,10 @@ public:
         v->visit(this);
     }
 
+    const std::string & getName(void) {
+        return FnName;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementCall to function: " << FnName;

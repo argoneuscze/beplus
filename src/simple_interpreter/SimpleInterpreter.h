@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <memory>
+#include <string>
 
 #include "../parser/ast/Visitor.h"
 #include "../parser/ast/ASTNode.h"
@@ -57,6 +59,8 @@ private:
 
     Module* const Module;
     std::shared_ptr<Value> CurValue;
+
+    std::map<std::string, std::shared_ptr<ASTFunction>> FunctionTable;
 
     void interpret();
 };
