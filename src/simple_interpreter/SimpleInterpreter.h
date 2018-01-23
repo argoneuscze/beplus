@@ -60,7 +60,7 @@ private:
     Module* const Module;
     std::shared_ptr<Value> CurValue;
 
-    std::map<std::string, std::shared_ptr<ASTFunction>> FunctionTable;
+    std::map<std::string, std::unique_ptr<ASTFunction>> FunctionTable;
 
     void interpret();
 };

@@ -23,6 +23,10 @@ public:
         return FnName;
     }
 
+    const std::vector<std::unique_ptr<ASTExpression>> * getArgs(void) {
+        return &Args;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "ASTStatementCall to function: " << FnName;

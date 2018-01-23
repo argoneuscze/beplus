@@ -14,6 +14,10 @@ public:
         v->visit(this);
     }
 
+    const std::string & getName(void) {
+        return Name;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         std::string StrType;

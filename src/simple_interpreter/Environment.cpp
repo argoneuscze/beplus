@@ -28,7 +28,7 @@ bool Environment::initVariable(const std::string & name, const std::shared_ptr<V
 
     const auto var = Variables.find(name);
 
-    if (var != Variables.end()) {
+    if (var == Variables.end()) {
         Variables[name] = value;
         std::cout << "[Env] Successfully initialized variable." << std::endl;
         return true;

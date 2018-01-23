@@ -57,6 +57,7 @@ void SimpleInterpreter::visit(ASTFunction* func) {
     FunctionTable[func->getPrototype()->getName()] = std::make_unique<ASTFunction>(std::move(*func));
 }
 
+// TODO remove visiting prototype
 void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
     std::cout << "[SimInt] Visiting ASTFunctionPrototype" << std::endl;
 }
@@ -170,22 +171,25 @@ void SimpleInterpreter::visit(ASTStatementCall* call) {
 
     CurEnv = CurEnv->fork();
 
+    // TODO resolve args + var names, push them into env
+    // TODO check datatypes
+    auto argsPrototype = func->second->getPrototype()->getArgs();
+    auto argsCall = call->getArgs();
+
+    if(argsCall->size() != argsPrototype->size())
+        throw InterpreterException("Wrong number of arguments when calling function.");
+  
+    for(int i = 0; i < argsCall->size(); i++) {
+        auto name = (*argsPrototype)[i]->getName();
+        (*argsCall)[i]->accept(this);
+
+        if(!CurEnv->initVariable(name, CurValue))
+            throw InterpreterException("Could not initialize a variable in the new environment.");
+    }
+
     func->second->getBlock()->accept(this);
 
     CurEnv = CurEnv->restorePrev();
-
-    // copypaste from old astfunction
-    // create new environment for function
-    //CurEnv = CurEnv->fork();
-
-    // TODO do stuff with function
-    //func->getPrototype()->accept(this);
-    // TODO - push prototype args into env, check their existence ...
-    //func->getBlock()->accept(this);
-
-    // restore previous environment
-    //CurEnv = CurEnv->restorePrev();
-
 }
 
 void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {
