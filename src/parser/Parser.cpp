@@ -326,8 +326,6 @@ std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string id
 
 // IF ::= 'if' '(' EXPR ')' STMT ('elsif' STMT)* ('else' STMT)*
 // TODO finish parsing elsif/else blocks
-// TODO if ( EXPR+ ) or if ( EXPR )? should only be EXPR as || && operators
-// and such are simple binary operators?
 std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
     LogDebug("Parsing an if statement");
 
@@ -348,8 +346,16 @@ std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
     Lexer->readNextToken(); // eat ')'
 
     auto stmt = parseStatement();
+    std::unique_ptr<ASTStatement> stmtElse;
 
-    return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt));
+    // TODO elsif
+
+    if (Lexer->getCurToken() == TokenType::KW_ELSE) {
+        Lexer->readNextToken(); // eat 'else'
+        stmtElse = parseStatement();
+    }
+
+    return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt), std::move(stmtElse));
 }
 
 // WHILE ::= 'while' '(' EXPR ')' STMT

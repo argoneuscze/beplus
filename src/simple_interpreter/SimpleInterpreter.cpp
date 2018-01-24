@@ -223,6 +223,8 @@ void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
 
     if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue())
         ifStmt->getCondExec()->accept(this);
+    else
+        ifStmt->getElseExec()->accept(this);
 }
 
 void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {

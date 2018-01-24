@@ -35,6 +35,8 @@ TokenType Lexer::getTok() {
             BinValue = BinOp::OP_AND;
             return TokenType::KW_BINARYOP;
         }
+        if (LowerCase == "else")
+            return TokenType::KW_ELSE;
         if (LowerCase == "def")
             return TokenType::KW_DEF;
         if (LowerCase == "if")

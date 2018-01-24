@@ -7,6 +7,7 @@ enum class TokenType {
     KW_DEF,
     KW_DATATYPE,
     KW_IF,
+    KW_ELSE,
     KW_FOR,
     KW_WHILE,
     KW_RETURN,
