@@ -89,6 +89,7 @@ std::unique_ptr<ASTExpression> Parser::parseExpression() {
  * Fortunately enough, Lexer's StrValue holds an identifier, not
  * the current symbol.
  */
+// TODO parse CALL
 std::unique_ptr<ASTExpression> Parser::parsePrimary() {
     switch (Lexer->getCurToken()) {
     case TokenType::NUMBER:
