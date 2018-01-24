@@ -50,12 +50,16 @@ void SimpleInterpreter::visit(ASTFunction* func) {
     std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
 
     auto fn = FunctionTable.find(func->getPrototype()->getName());
+
     if (fn != FunctionTable.end()) {
         std::string err = "Function " + func->getPrototype()->getName() + " already exists in the table.";
         throw InterpreterException(err);
     }
 
-    FunctionTable[func->getPrototype()->getName()] = std::make_unique<ASTFunction>(std::move(*func));
+    // Necessary, otherwise the moving of *func can nullify prototype/func.
+    auto name = func->getPrototype()->getName();
+
+    FunctionTable[name] = std::make_unique<ASTFunction>(std::move(*func));
 }
 
 // TODO remove visiting prototype
