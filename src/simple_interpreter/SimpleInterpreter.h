@@ -47,6 +47,7 @@ public:
     void visit(ASTStatementCall* call) override;
     void visit(ASTStatementCallBuiltin* call) override;
     void visit(ASTStatementDecl* decl) override;
+    void visit(ASTStatementElsif* elsif) override;
     void visit(ASTStatementExpr* expr) override;
     void visit(ASTStatementIf* ifStmt) override;
     void visit(ASTStatementWhile* whileStmt) override;

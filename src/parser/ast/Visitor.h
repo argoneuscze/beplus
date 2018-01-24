@@ -13,6 +13,7 @@ class ASTStatementBlock;
 class ASTStatementCall;
 class ASTStatementCallBuiltin;
 class ASTStatementDecl;
+class ASTStatementElsif;
 class ASTStatementExpr;
 class ASTStatementIf;
 class ASTStatementWhile;
@@ -39,6 +40,7 @@ public:
     virtual void visit(ASTStatementCall* call) = 0;
     virtual void visit(ASTStatementCallBuiltin* call) = 0;
     virtual void visit(ASTStatementDecl* decl) = 0;
+    virtual void visit(ASTStatementElsif* elsif) = 0;
     virtual void visit(ASTStatementExpr* expr) = 0;
     virtual void visit(ASTStatementIf* ifStmt) = 0;
     virtual void visit(ASTStatementWhile* whileStmt) = 0;

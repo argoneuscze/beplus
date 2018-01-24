@@ -95,6 +95,7 @@ private:
     std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::unique_ptr<ASTStatementAssign> parseAssignment(const std::string ident);
     std::unique_ptr<ASTStatementIf> parseIf(void);
+    std::vector<std::unique_ptr<ASTStatementElsif>> parseElsif(void);
     std::unique_ptr<ASTStatementWhile> parseWhile(void);
 
     std::unique_ptr<ASTBlock> parseBlock();

@@ -14,6 +14,7 @@
 #include "../parser/ast/ASTStatementCall.h"
 #include "../parser/ast/ASTStatementCallBuiltin.h"
 #include "../parser/ast/ASTStatementDecl.h"
+#include "../parser/ast/ASTStatementElsif.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTStatementIf.h"
 #include "../parser/ast/ASTStatementWhile.h"
@@ -211,6 +212,10 @@ void SimpleInterpreter::visit(ASTStatementDecl* decl) {
         throw InterpreterException("Unable to initialize variable.");
 }
 
+void SimpleInterpreter::visit(ASTStatementElsif* elsif) {
+    std::cout << "[SimInt] Visiting an ASTStatementElsif" << std::endl;
+}
+
 void SimpleInterpreter::visit(ASTStatementExpr* expr) {
     std::cout << "[SimInt] Visiting an ASTStatementExpr" << std::endl;
 
@@ -223,8 +228,17 @@ void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
 
     if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue())
         ifStmt->getCondExec()->accept(this);
-    else
-        ifStmt->getElseExec()->accept(this);
+    else {
+        for (auto & elsif : *(ifStmt->getElsifs())) {
+            elsif->getCond()->accept(this);
+            if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue()) {
+                elsif->getCondExec()->accept(this);
+                break;
+            }
+        }
+        if (ifStmt->getElseExec() != nullptr)
+            ifStmt->getElseExec()->accept(this);
+    }
 }
 
 void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {

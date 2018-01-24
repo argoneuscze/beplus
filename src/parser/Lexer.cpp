@@ -37,6 +37,8 @@ TokenType Lexer::getTok() {
         }
         if (LowerCase == "else")
             return TokenType::KW_ELSE;
+        if (LowerCase == "elsif")
+            return TokenType::KW_ELSIF;
         if (LowerCase == "def")
             return TokenType::KW_DEF;
         if (LowerCase == "if")

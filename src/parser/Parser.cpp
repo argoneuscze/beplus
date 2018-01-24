@@ -324,6 +324,33 @@ std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string id
     return std::make_unique<ASTStatementAssign>(ident, std::move(expr));
 }
 
+std::vector<std::unique_ptr<ASTStatementElsif>> Parser::parseElsif(void) {
+    std::vector<std::unique_ptr<ASTStatementElsif>> elseIfs;
+
+    while (Lexer->getCurToken() == TokenType::KW_ELSIF) {
+        Lexer->readNextToken(); // eat 'elsif'
+        if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
+            Err = "Expected a '(' after an elsif, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+        Lexer->readNextToken(); // eat '('
+
+        auto cond = parseExpression();
+
+        if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
+            Err = "Expected a ')' at the end of an elsif statement, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+        Lexer->readNextToken(); // eat ')'
+
+        auto stmt = parseStatement();
+
+        elseIfs.push_back(std::make_unique<ASTStatementElsif>(std::move(cond), std::move(stmt)));
+    }
+
+    return elseIfs;
+}
+
 // IF ::= 'if' '(' EXPR ')' STMT ('elsif' STMT)* ('else' STMT)*
 // TODO finish parsing elsif/else blocks
 std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
@@ -346,16 +373,19 @@ std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
     Lexer->readNextToken(); // eat ')'
 
     auto stmt = parseStatement();
-    std::unique_ptr<ASTStatement> stmtElse;
 
-    // TODO elsif
+    std::vector<std::unique_ptr<ASTStatementElsif>> elseIfs;
+    if (Lexer->getCurToken() == TokenType::KW_ELSIF)
+        elseIfs = parseElsif();
+
+    std::unique_ptr<ASTStatement> stmtElse;
 
     if (Lexer->getCurToken() == TokenType::KW_ELSE) {
         Lexer->readNextToken(); // eat 'else'
         stmtElse = parseStatement();
     }
 
-    return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt), std::move(stmtElse));
+    return std::make_unique<ASTStatementIf>(std::move(expr), std::move(stmt), std::move(stmtElse), std::move(elseIfs));
 }
 
 // WHILE ::= 'while' '(' EXPR ')' STMT
