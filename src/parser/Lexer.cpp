@@ -27,6 +27,14 @@ TokenType Lexer::getTok() {
         for (size_t i = 0; i < LowerCase.size(); ++i)
             LowerCase[i] = tolower(StrValue[i]);
 
+        if (LowerCase == "or") {
+            BinValue = BinOp::OP_OR;
+            return TokenType::KW_BINARYOP;
+        }
+        if (LowerCase == "and") {
+            BinValue = BinOp::OP_AND;
+            return TokenType::KW_BINARYOP;
+        }
         if (LowerCase == "def")
             return TokenType::KW_DEF;
         if (LowerCase == "if")

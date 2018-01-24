@@ -6,7 +6,7 @@ public:
     explicit ASTStatementCallBuiltin(const std::string & fnName, std::vector<std::unique_ptr<ASTExpression>> args) : FnName(fnName), Args(std::move(args)) {
 }
 
-    void accept(Visitor* v) {
+    void accept(Visitor* v) override {
         v->visit(this);
     }
 

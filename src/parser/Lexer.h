@@ -47,6 +47,8 @@ enum class BinOp {
     OP_SUB,
     OP_MUL,
     OP_DIV,
+    OP_AND,
+    OP_OR,
     OP_EQL,
     OP_NEQL,
     OP_LT,

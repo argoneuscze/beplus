@@ -117,6 +117,12 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
     case BinOp::OP_GTE:
         CurValue = std::make_shared<ValueNumber>(val1->getValue() >= val2->getValue());
         break;
+    case BinOp::OP_AND:
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() && val2->getValue());
+        break;
+    case BinOp::OP_OR:
+        CurValue = std::make_shared<ValueNumber>(val1->getValue() || val2->getValue());
+        break;
     default:
         break;
     }

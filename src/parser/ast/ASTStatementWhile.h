@@ -5,7 +5,7 @@ public:
     explicit ASTStatementWhile(std::unique_ptr<ASTExpression> cond, std::unique_ptr<ASTStatement> statement) : Cond(std::move(cond)), Statement(std::move(statement)) {
 }
 
-    void accept(Visitor* v) {
+    void accept(Visitor* v) override {
         v->visit(this);
     }
 

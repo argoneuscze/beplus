@@ -55,6 +55,8 @@ public:
             {BinOp::OP_LTE, 15},
             {BinOp::OP_GT, 15},
             {BinOp::OP_GTE, 15},
+            {BinOp::OP_AND, 6},
+            {BinOp::OP_OR, 4},
         };
     }
 
