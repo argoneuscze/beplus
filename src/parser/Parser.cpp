@@ -504,30 +504,12 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
         stmt = parseReturn();
         return stmt;
     }
-    // CALL ::= IDENT '('
-    // ASSIGN ::= IDENT '='
-    // EXPR ::= IDENT BINOP* (default behaviour)
-    else if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
-       /*std::string ident = Lexer->getStrValue();
-        Lexer->readNextToken(); // eat IDENT
-        if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP) {
-            stmt = parseAssignment(ident);
-        }
-        else { // Necessary to check that we're not parsing IDENT IDENT
-            if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
-                throw ParserException("Did not expect an identifier after an identifier.");
-            }
-            // IDENT BINOP*
-            // IDENT '('
-            auto expr = parseExpression();
-            stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
-        }*/
-      auto expr = parseExpression();
-      stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
-    }
     // EXPR ::= NUMBER BINOP*
+    // EXPR ::= IDENT (CALL/ASSIGN/EXPR)
     // ANYTHING ::= EXPR (basically last resort, e.g. starting with '(')
-    else if (Lexer->getCurToken() == TokenType::NUMBER || Lexer->getCurToken() == TokenType::KW_LEFTBRACKET) {
+    else if (Lexer->getCurToken() == TokenType::NUMBER
+            || Lexer->getCurToken() == TokenType::IDENTIFIER
+            || Lexer->getCurToken() == TokenType::KW_LEFTBRACKET) {
         auto expr = parseExpression();
         stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
     }
