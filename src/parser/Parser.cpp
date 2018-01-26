@@ -91,13 +91,15 @@ std::unique_ptr<ASTExpression> Parser::parseExpression() {
  */
 // TODO parse CALL
 std::unique_ptr<ASTExpression> Parser::parsePrimary() {
+    LogDebug("Parsing primary");
+
     switch (Lexer->getCurToken()) {
     case TokenType::NUMBER:
         return parseNumberExpression();
     case TokenType::KW_LEFTBRACKET:
         return parseParenthesisExpression();
     case TokenType::IDENTIFIER:
-        return parseVariableExpression();
+        return parseIdentExpression();
     case TokenType::KW_BINARYOP:
     case TokenType::KW_SEMICOLON:
         return parseBinOpRHS(0, std::make_unique<ASTExpressionVariable>(Lexer->getStrValue()));
@@ -107,6 +109,75 @@ when parsing expression.";
         throw ParserException(Err);
     }
 }
+
+// This method gets called when parsing an expression in two possible scenarios:
+// a) We're parsing a call
+// b) We're parsing a variable
+// in expressions such as 2 + a; 3 + foo(x); and others.
+std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
+    LogDebug("Parsing an expression with an ident.");
+
+    auto str = Lexer->getStrValue();
+    Lexer->readNextToken(); // eat ident
+
+    if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
+        return parseCall(str);
+    else if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP)
+        return parseAssignment(str);
+    else
+        return std::make_unique<ASTExpressionVariable>(str);
+}
+
+// ASSIGN ::= '=' EXPR
+std::unique_ptr<ASTExpressionAssign> Parser::parseAssignment(const std::string & ident) {
+    LogDebug("Parsing an assignment");
+
+    Lexer->readNextToken(); // eat '='
+
+    auto expr = parseExpression();
+
+    return std::make_unique<ASTExpressionAssign>(ident, std::move(expr));
+}
+
+// CALL ::= '(' ARGS* ')'
+// ident passed as an argument due to the parser needing to see the bracket
+// to decide whether the statement really is a function call.
+// possible TODO - check the module whether the function prototype actually
+//                 exists and can be satisfied with this call?
+std::unique_ptr<ASTExpression> Parser::parseCall(const std::string & ident) {
+    LogDebug("Parsing a call expression");
+
+    std::vector<std::unique_ptr<ASTExpression>> args;
+    Lexer->readNextToken(); // eat '('
+
+    if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET) {
+        Lexer->readNextToken(); // eat ')'
+        return std::make_unique<ASTExpressionCall>(ident, std::move(args));
+    }
+
+    // ARGS ::= EXPR , EXPR , ...
+    while (true) {
+        auto arg = parseExpression();
+        args.push_back(std::move(arg));
+
+        switch (Lexer->getCurToken()) {
+        case TokenType::KW_COMMA:
+            Lexer->readNextToken(); // eat ',' 
+            continue;
+        case TokenType::KW_RIGHTBRACKET:
+            Lexer->readNextToken(); // eat ')'
+            if (functionBuiltin(ident))
+                return std::make_unique<ASTExpressionCallBuiltin>(ident, std::move(args));
+            return std::make_unique<ASTExpressionCall>(ident, std::move(args));
+        default:
+            Err = "Expected ',' or ')', instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+    }
+
+    throw ParserException("parseCall() should never get here.");
+}
+
 
 std::unique_ptr<ASTExpression> Parser::parseBinOpRHS(const int prec, std::unique_ptr<ASTExpression> LHS) {
     LogDebug("Parsing binary operation");
@@ -275,56 +346,6 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
     return std::make_unique<ASTStatementDecl>(type, ident.c_str());
 }
 
-// CALL ::= ARGS* ')'
-// ident passed as an argument due to the parser needing to see the bracket
-// to decide whether the statement really is a function call.
-// possible TODO - check the module whether the function prototype actually
-//                 exists and can be satisfied with this call?
-std::unique_ptr<ASTStatement> Parser::parseCall(const std::string ident) {
-    LogDebug("Parsing a call");
-
-    std::vector<std::unique_ptr<ASTExpression>> args;
-    Lexer->readNextToken(); // eat '('
-
-    if (Lexer->getCurToken() == TokenType::KW_RIGHTBRACKET) {
-        Lexer->readNextToken(); // eat ')'
-        return std::make_unique<ASTStatementCall>(ident, std::move(args));
-    }
-
-    // ARGS ::= EXPR , EXPR , ...
-    while (true) {
-        auto arg = parseExpression();
-        args.push_back(std::move(arg));
-
-        switch (Lexer->getCurToken()) {
-        case TokenType::KW_COMMA:
-            Lexer->readNextToken(); // eat ',' 
-            continue;
-        case TokenType::KW_RIGHTBRACKET:
-            Lexer->readNextToken(); // eat ')'
-            if (functionBuiltin(ident))
-                return std::make_unique<ASTStatementCallBuiltin>(ident, std::move(args));
-            return std::make_unique<ASTStatementCall>(ident, std::move(args));
-        default:
-            Err = "Expected ',' or ')', instead got: " + Lexer->getCurSymbol();
-            throw ParserException(Err);
-        }
-    }
-
-    throw ParserException("parseCall() should never get here.");
-}
-
-// ASSIGN ::= '=' EXPR
-std::unique_ptr<ASTStatementAssign> Parser::parseAssignment(const std::string ident) {
-    LogDebug("Parsing an assignment");
-
-    Lexer->readNextToken(); // eat '='
-
-    auto expr = parseExpression();
-
-    return std::make_unique<ASTStatementAssign>(ident, std::move(expr));
-}
-
 std::vector<std::unique_ptr<ASTStatementElsif>> Parser::parseElsif(void) {
     std::vector<std::unique_ptr<ASTStatementElsif>> elseIfs;
 
@@ -487,20 +508,22 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // ASSIGN ::= IDENT '='
     // EXPR ::= IDENT BINOP* (default behaviour)
     else if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
-        std::string ident = Lexer->getStrValue();
+       /*std::string ident = Lexer->getStrValue();
         Lexer->readNextToken(); // eat IDENT
-        if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
-            stmt = parseCall(ident);
-        else if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP) {
+        if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP) {
             stmt = parseAssignment(ident);
         }
         else { // Necessary to check that we're not parsing IDENT IDENT
             if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
                 throw ParserException("Did not expect an identifier after an identifier.");
             }
+            // IDENT BINOP*
+            // IDENT '('
             auto expr = parseExpression();
             stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
-        }
+        }*/
+      auto expr = parseExpression();
+      stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
     }
     // EXPR ::= NUMBER BINOP*
     // ANYTHING ::= EXPR (basically last resort, e.g. starting with '(')
@@ -515,6 +538,7 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
         throw ParserException(Err);
     }
     Lexer->readNextToken(); // eat ';'
+
 
     return stmt;
 }

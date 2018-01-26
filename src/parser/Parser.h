@@ -11,14 +11,14 @@
 #include "ast/ASTExpression.h"
 #include "ast/ASTFunction.h"
 #include "ast/ASTFunctionPrototype.h"
+#include "ast/ASTExpressionAssign.h"
+#include "ast/ASTExpressionBinOp.h"
+#include "ast/ASTExpressionCall.h"
+#include "ast/ASTExpressionCallBuiltin.h"
 #include "ast/ASTExpressionNumber.h"
 #include "ast/ASTExpressionVariable.h"
-#include "ast/ASTExpressionBinOp.h"
 #include "ast/ASTBlock.h"
-#include "ast/ASTStatementAssign.h"
 #include "ast/ASTStatementBlock.h"
-#include "ast/ASTStatementCall.h"
-#include "ast/ASTStatementCallBuiltin.h"
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementExpr.h"
 #include "ast/ASTStatementIf.h"
@@ -85,14 +85,15 @@ private:
 
     std::unique_ptr<ASTExpression> parseExpression();
     std::unique_ptr<ASTExpression> parsePrimary();
+    std::unique_ptr<ASTExpressionAssign> parseAssignment(const std::string & ident);
     std::unique_ptr<ASTExpression> parseBinOpRHS(int prec, std::unique_ptr<ASTExpression> LHS);
+    std::unique_ptr<ASTExpression> parseCall(const std::string & ident);
+    std::unique_ptr<ASTExpression> parseIdentExpression(void);
     std::unique_ptr<ASTExpressionNumber> parseNumberExpression();
     std::unique_ptr<ASTExpressionVariable> parseVariableExpression(void);
     std::unique_ptr<ASTExpression> parseParenthesisExpression();
 
     std::unique_ptr<ASTStatement> parseStatement(void);
-    std::unique_ptr<ASTStatementAssign> parseAssignment(const std::string ident);
-    std::unique_ptr<ASTStatement> parseCall(std::string ident);
     std::unique_ptr<ASTStatementBlock> parseBlockStatement(void);
     std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::vector<std::unique_ptr<ASTStatementElsif>> parseElsif(void);

@@ -47,14 +47,14 @@ public:
     void visit(ASTFunction* func) override;
     void visit(ASTFunctionPrototype* prototype) override;
     void visit(ASTArgument* arg) override;
+    void visit(ASTExpressionAssign* assign) override;
     void visit(ASTExpressionBinOp* binOp) override;
+    void visit(ASTExpressionCall* call) override;
+    void visit(ASTExpressionCallBuiltin* call) override;
     void visit(ASTExpressionNumber* num) override;
     void visit(ASTExpressionVariable* var) override;
     void visit(ASTBlock* block) override;
-    void visit(ASTStatementAssign* assign) override;
     void visit(ASTStatementBlock* block) override;
-    void visit(ASTStatementCall* call) override;
-    void visit(ASTStatementCallBuiltin* call) override;
     void visit(ASTStatementDecl* decl) override;
     void visit(ASTStatementElsif* elsif) override;
     void visit(ASTStatementExpr* expr) override;
@@ -63,7 +63,7 @@ public:
     void visit(ASTStatementWhile* whileStmt) override;
 
 private:
-    void builtinPrint(ASTStatementCallBuiltin* call);
+    void builtinPrint(ASTExpressionCallBuiltin* call);
 
     std::unique_ptr<Environment> GlobalEnv;
     Environment* CurEnv;

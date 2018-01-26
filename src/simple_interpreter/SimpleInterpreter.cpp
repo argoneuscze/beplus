@@ -5,14 +5,14 @@
 
 #include "../parser/ast/ASTArgument.h"
 #include "../parser/ast/ASTFunction.h"
+#include "../parser/ast/ASTExpressionAssign.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
+#include "../parser/ast/ASTExpressionCall.h"
+#include "../parser/ast/ASTExpressionCallBuiltin.h"
 #include "../parser/ast/ASTExpressionNumber.h"
 #include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
-#include "../parser/ast/ASTStatementAssign.h"
 #include "../parser/ast/ASTStatementBlock.h"
-#include "../parser/ast/ASTStatementCall.h"
-#include "../parser/ast/ASTStatementCallBuiltin.h"
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementElsif.h"
 #include "../parser/ast/ASTStatementExpr.h"
@@ -70,6 +70,56 @@ void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
 
 void SimpleInterpreter::visit(ASTArgument* arg) {
 }
+
+void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
+    std::cout << "[SimInt] Visiting an assignment" << std::endl;
+    const auto name = assign->getName();
+    assign->getExpr()->accept(this);
+    const auto val_ptr = CurValue;
+
+    if(!CurEnv->setVariable(name, val_ptr))
+        throw InterpreterException("Could not set a variable to its value.");
+}
+
+void SimpleInterpreter::visit(ASTExpressionCall* call) {
+    std::cout << "[SimInt] Visiting a call" << std::endl;
+
+    auto func = FunctionTable.find(call->getName());
+
+    if (func == FunctionTable.end()) {
+        std::string err = "Function " + call->getName() + " not found in the function table.";
+        throw InterpreterException(err);
+    }
+
+    CurEnv = CurEnv->fork();
+
+    // TODO resolve args + var names, push them into env
+    // TODO check datatypes
+    auto argsPrototype = func->second->getPrototype()->getArgs();
+    auto argsCall = call->getArgs();
+
+    if(argsCall->size() != argsPrototype->size())
+        throw InterpreterException("Wrong number of arguments when calling function.");
+  
+    for(int i = 0; i < argsCall->size(); i++) {
+        auto name = (*argsPrototype)[i]->getName();
+        (*argsCall)[i]->accept(this);
+
+        if(!CurEnv->initVariable(name, CurValue))
+            throw InterpreterException("Could not initialize a variable in the new environment.");
+    }
+
+    func->second->getBlock()->accept(this);
+
+    CurEnv = CurEnv->restorePrev();
+}
+
+void SimpleInterpreter::visit(ASTExpressionCallBuiltin* call) {
+    std::cout << "[SimInt] Visiting a builtin call" << std::endl;
+    if (call->getName() == "print")
+        builtinPrint(call);
+}
+
 
 void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
     std::cout << "[SimInt] Visiting ASTExpressionBinOp" << std::endl;
@@ -160,59 +210,10 @@ void SimpleInterpreter::visit(ASTBlock* block) {
     }
 }
 
-void SimpleInterpreter::visit(ASTStatementAssign* assign) {
-    std::cout << "[SimInt] Visiting an assignment" << std::endl;
-    const auto name = assign->getName();
-    assign->getExpr()->accept(this);
-    const auto val_ptr = CurValue;
-
-    if(!CurEnv->setVariable(name, val_ptr))
-        throw InterpreterException("Could not set a variable to its value.");
-}
-
 void SimpleInterpreter::visit(ASTStatementBlock* block) {
     std::cout << "[SimInt] Visiting a block statement" << std::endl;
 
     block->getBlock()->accept(this);
-}
-
-void SimpleInterpreter::visit(ASTStatementCall* call) {
-    std::cout << "[SimInt] Visiting a call" << std::endl;
-
-    auto func = FunctionTable.find(call->getName());
-
-    if (func == FunctionTable.end()) {
-        std::string err = "Function " + call->getName() + " not found in the function table.";
-        throw InterpreterException(err);
-    }
-
-    CurEnv = CurEnv->fork();
-
-    // TODO resolve args + var names, push them into env
-    // TODO check datatypes
-    auto argsPrototype = func->second->getPrototype()->getArgs();
-    auto argsCall = call->getArgs();
-
-    if(argsCall->size() != argsPrototype->size())
-        throw InterpreterException("Wrong number of arguments when calling function.");
-  
-    for(int i = 0; i < argsCall->size(); i++) {
-        auto name = (*argsPrototype)[i]->getName();
-        (*argsCall)[i]->accept(this);
-
-        if(!CurEnv->initVariable(name, CurValue))
-            throw InterpreterException("Could not initialize a variable in the new environment.");
-    }
-
-    func->second->getBlock()->accept(this);
-
-    CurEnv = CurEnv->restorePrev();
-}
-
-void SimpleInterpreter::visit(ASTStatementCallBuiltin* call) {
-    std::cout << "[SimInt] Visiting a builtin call" << std::endl;
-    if (call->getName() == "print")
-        builtinPrint(call);
 }
 
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
@@ -281,7 +282,7 @@ void SimpleInterpreter::interpret() {
     }
 }
 
-void SimpleInterpreter::builtinPrint(ASTStatementCallBuiltin* call) {
+void SimpleInterpreter::builtinPrint(ASTExpressionCallBuiltin* call) {
     std::cout << "[SimInt] Executing builtin print()" << std::endl;
 
     for (auto& arg : *(call->getArgs())) {
