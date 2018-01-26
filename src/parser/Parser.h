@@ -22,6 +22,7 @@
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementExpr.h"
 #include "ast/ASTStatementIf.h"
+#include "ast/ASTStatementReturn.h"
 #include "ast/ASTStatementWhile.h"
 #include "ast/Module.h"
 
@@ -90,12 +91,13 @@ private:
     std::unique_ptr<ASTExpression> parseParenthesisExpression();
 
     std::unique_ptr<ASTStatement> parseStatement(void);
-    std::unique_ptr<ASTStatementBlock> parseBlockStatement(void);
-    std::unique_ptr<ASTStatement> parseCall(std::string ident);
-    std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::unique_ptr<ASTStatementAssign> parseAssignment(const std::string ident);
-    std::unique_ptr<ASTStatementIf> parseIf(void);
+    std::unique_ptr<ASTStatement> parseCall(std::string ident);
+    std::unique_ptr<ASTStatementBlock> parseBlockStatement(void);
+    std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::vector<std::unique_ptr<ASTStatementElsif>> parseElsif(void);
+    std::unique_ptr<ASTStatementIf> parseIf(void);
+    std::unique_ptr<ASTStatementReturn> parseReturn(void);
     std::unique_ptr<ASTStatementWhile> parseWhile(void);
 
     std::unique_ptr<ASTBlock> parseBlock();

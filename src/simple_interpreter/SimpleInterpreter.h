@@ -13,7 +13,6 @@
 
 class InterpreterException : std::exception {
 public:
-    //explicit ParserException(const char* msg) {
     explicit InterpreterException(const std::string& msg) {
         this->msg = msg;
     }
@@ -25,6 +24,16 @@ public:
 private:
     //const char* msg;
     std::string msg;
+};
+
+class ReturnException : std::exception {
+public:
+    explicit ReturnException() {
+    }
+
+    char const* what() const noexcept override {
+        return "Return found in AST block.";
+    }
 };
 
 class SimpleInterpreter : public Visitor {
@@ -50,6 +59,7 @@ public:
     void visit(ASTStatementElsif* elsif) override;
     void visit(ASTStatementExpr* expr) override;
     void visit(ASTStatementIf* ifStmt) override;
+    void visit(ASTStatementReturn* ret) override;
     void visit(ASTStatementWhile* whileStmt) override;
 
 private:

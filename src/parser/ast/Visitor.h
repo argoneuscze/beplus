@@ -16,6 +16,7 @@ class ASTStatementDecl;
 class ASTStatementElsif;
 class ASTStatementExpr;
 class ASTStatementIf;
+class ASTStatementReturn;
 class ASTStatementWhile;
 
 class Visitor {
@@ -43,6 +44,7 @@ public:
     virtual void visit(ASTStatementElsif* elsif) = 0;
     virtual void visit(ASTStatementExpr* expr) = 0;
     virtual void visit(ASTStatementIf* ifStmt) = 0;
+    virtual void visit(ASTStatementReturn* ret) = 0;
     virtual void visit(ASTStatementWhile* whileStmt) = 0;
 };
 

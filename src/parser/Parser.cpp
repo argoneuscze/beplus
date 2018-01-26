@@ -353,7 +353,6 @@ std::vector<std::unique_ptr<ASTStatementElsif>> Parser::parseElsif(void) {
 }
 
 // IF ::= 'if' '(' EXPR ')' STMT ('elsif' STMT)* ('else' STMT)*
-// TODO finish parsing elsif/else blocks
 std::unique_ptr<ASTStatementIf> Parser::parseIf(void) {
     LogDebug("Parsing an if statement");
 
@@ -429,13 +428,31 @@ std::unique_ptr<ASTStatementBlock> Parser::parseBlockStatement(void) {
     return std::make_unique<ASTStatementBlock>(std::move(block));
 }
 
+// RETURN ::= 'return' EXPR ';'
+std::unique_ptr<ASTStatementReturn> Parser::parseReturn(void) {
+    LogDebug("Parsing a return statement");
+
+    Lexer->readNextToken(); // eat '{'
+
+    auto expr = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        Err = "Expected a ';' at the end of a return statement, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ';'
+
+    return std::make_unique<ASTStatementReturn>(std::move(expr));
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
 // statement ::= EXPR ';'
 // statament ::= IF
 // statement ::= WHILE
-// statement ::= BLOCK TODO
+// statement ::= BLOCK 
+// statement ::= RETURN
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
 std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
@@ -459,6 +476,11 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // BLOCK ::= '{'
     else if (Lexer->getCurToken() == TokenType::KW_LEFTCURLYBRACKET) {
         stmt = parseBlockStatement();
+        return stmt;
+    }
+    // RETURN ::= 'return'
+    else if (Lexer->getCurToken() == TokenType::KW_RETURN) {
+        stmt = parseReturn();
         return stmt;
     }
     // CALL ::= IDENT '('

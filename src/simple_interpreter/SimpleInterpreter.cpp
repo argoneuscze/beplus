@@ -17,6 +17,7 @@
 #include "../parser/ast/ASTStatementElsif.h"
 #include "../parser/ast/ASTStatementExpr.h"
 #include "../parser/ast/ASTStatementIf.h"
+#include "../parser/ast/ASTStatementReturn.h"
 #include "../parser/ast/ASTStatementWhile.h"
 #include "../parser/ast/ASTBlock.h"
 
@@ -149,8 +150,13 @@ void SimpleInterpreter::visit(ASTExpressionVariable* var) {
 void SimpleInterpreter::visit(ASTBlock* block) {
     std::cout << "[SimInt] Visiting a block" << std::endl;
 
-    for (auto& node : *(block->getStatements())) {
-        node->accept(this);
+    try {
+        for (auto& node : *(block->getStatements())) {
+            node->accept(this);
+        }
+    }
+    catch (ReturnException& ex) {
+        return;
     }
 }
 
@@ -243,6 +249,14 @@ void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
         if (ifStmt->getElseExec() != nullptr)
             ifStmt->getElseExec()->accept(this);
     }
+}
+
+void SimpleInterpreter::visit(ASTStatementReturn* ret) {
+    std::cout << "[SimInt] Visiting a return statement" << std::endl;
+
+    ret->getRetExpr()->accept(this);
+
+    throw ReturnException();
 }
 
 void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {
