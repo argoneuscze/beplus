@@ -18,6 +18,7 @@
 #include "../parser/ast/ASTStatementDecl.h"
 #include "../parser/ast/ASTStatementElsif.h"
 #include "../parser/ast/ASTStatementExpr.h"
+#include "../parser/ast/ASTStatementFor.h"
 #include "../parser/ast/ASTStatementIf.h"
 #include "../parser/ast/ASTStatementReturn.h"
 #include "../parser/ast/ASTStatementWhile.h"
@@ -256,6 +257,7 @@ void SimpleInterpreter::visit(ASTBlock* block) {
     }
 }
 
+// TODO fork environment
 void SimpleInterpreter::visit(ASTStatementBlock* block) {
     std::cout << "[SimInt] Visiting a block statement" << std::endl;
 
@@ -281,6 +283,18 @@ void SimpleInterpreter::visit(ASTStatementExpr* expr) {
 
 void SimpleInterpreter::visit(ASTStatementFor* forExpr) {
     std::cout << "[SimInt] Visiting an ASTStatementFor" << std::endl;
+
+    forExpr->getInit()->accept(this);
+
+    while (true) {
+        forExpr->getCond()->accept(this);
+        if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue() != 1)
+            break;
+
+        forExpr->getStatement()->accept(this);
+
+        forExpr->getIter()->accept(this);
+    }
 }
 
 void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
