@@ -19,3 +19,13 @@ public:
 private:
     const long Value;
 };
+
+class ValueBool : public Value {
+public:
+    explicit ValueBool(const bool val);
+
+    bool getValue(void) const;
+
+private:
+    const long Value;
+};

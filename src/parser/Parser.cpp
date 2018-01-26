@@ -92,6 +92,8 @@ std::unique_ptr<ASTExpression> Parser::parsePrimary() {
     LogDebug("Parsing primary");
 
     switch (Lexer->getCurToken()) {
+    case TokenType::BOOL:
+        return parseBoolExpression();
     case TokenType::NUMBER:
         return parseNumberExpression();
     case TokenType::KW_LEFTBRACKET:
@@ -108,9 +110,18 @@ when parsing expression.";
     }
 }
 
-// This method gets called when parsing an expression in two possible scenarios:
+std::unique_ptr<ASTExpressionBool> Parser::parseBoolExpression(void) {
+    LogDebug("Parsing a bool expression.");
+
+    auto bl = std::make_unique<ASTExpressionBool>(Lexer->getBoolValue());
+    Lexer->readNextToken(); // eat boolean value
+    return bl;
+}
+
+// This method gets called when parsing an expression in these possible scenarios:
 // a) We're parsing a call
 // b) We're parsing a variable
+// c) We're parsing an assignment
 // in expressions such as 2 + a; 3 + foo(x); and others.
 std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
     LogDebug("Parsing an expression with an ident.");

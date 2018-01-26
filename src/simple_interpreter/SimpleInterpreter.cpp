@@ -8,6 +8,7 @@
 #include "../parser/ast/ASTExpressionAddAssign.h"
 #include "../parser/ast/ASTExpressionAssign.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
+#include "../parser/ast/ASTExpressionBool.h"
 #include "../parser/ast/ASTExpressionCall.h"
 #include "../parser/ast/ASTExpressionCallBuiltin.h"
 #include "../parser/ast/ASTExpressionNumber.h"
@@ -211,6 +212,10 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
     }
 
     std::cout << "[SimInt] Result: " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTExpressionBool* boolExpr) {
+    std::cout << "[SimInt] Visiting an ASTExpressionBool" << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {

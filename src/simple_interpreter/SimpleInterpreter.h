@@ -50,6 +50,7 @@ public:
     void visit(ASTExpressionAddAssign* assign) override;
     void visit(ASTExpressionAssign* assign) override;
     void visit(ASTExpressionBinOp* binOp) override;
+    void visit(ASTExpressionBool* boolExpr) override;
     void visit(ASTExpressionCall* call) override;
     void visit(ASTExpressionCallBuiltin* call) override;
     void visit(ASTExpressionNumber* num) override;

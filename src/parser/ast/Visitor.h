@@ -7,6 +7,7 @@ class ASTArgument;
 class ASTExpressionAddAssign;
 class ASTExpressionAssign;
 class ASTExpressionBinOp;
+class ASTExpressionBool;
 class ASTExpressionCall;
 class ASTExpressionCallBuiltin;
 class ASTExpressionNumber;
@@ -40,6 +41,7 @@ public:
     virtual void visit(ASTExpressionAddAssign* assign) = 0;
     virtual void visit(ASTExpressionAssign* assign) = 0;
     virtual void visit(ASTExpressionBinOp* arg) = 0;
+    virtual void visit(ASTExpressionBool* boolExpr) = 0;
     virtual void visit(ASTExpressionCall* call) = 0;
     virtual void visit(ASTExpressionCallBuiltin* call) = 0;
     virtual void visit(ASTExpressionNumber* arg) = 0;

@@ -14,6 +14,7 @@
 #include "ast/ASTExpressionAddAssign.h"
 #include "ast/ASTExpressionAssign.h"
 #include "ast/ASTExpressionBinOp.h"
+#include "ast/ASTExpressionBool.h"
 #include "ast/ASTExpressionCall.h"
 #include "ast/ASTExpressionCallBuiltin.h"
 #include "ast/ASTExpressionNumber.h"
@@ -90,6 +91,7 @@ private:
     std::unique_ptr<ASTExpression> parsePrimary();
     std::unique_ptr<ASTExpression> parseAssignment(const std::string & ident);
     std::unique_ptr<ASTExpression> parseBinOpRHS(int prec, std::unique_ptr<ASTExpression> LHS);
+    std::unique_ptr<ASTExpressionBool> parseBoolExpression(void);
     std::unique_ptr<ASTExpression> parseCall(const std::string & ident);
     std::unique_ptr<ASTExpression> parseIdentExpression(void);
     std::unique_ptr<ASTExpressionNumber> parseNumberExpression();

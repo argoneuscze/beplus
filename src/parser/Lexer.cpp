@@ -11,7 +11,7 @@ TokenType Lexer::readNextToken() {
 }
 
 TokenType Lexer::getTok() {
-    bool isNeg = false; // unary minus
+    bool isNeg = false; // unary minus TODO
 
     // skip all whitespaces
     while (isspace(LastChar))
@@ -66,7 +66,10 @@ TokenType Lexer::getTok() {
             DtValue = DataType::DT_CHAR;
             return TokenType::KW_DATATYPE;
         }
-
+        if (LowerCase == "bool") {
+            DtValue = DataType::DT_BOOL;
+            return TokenType::KW_DATATYPE;
+        }
         if (LowerCase == "true") {
             BoolValue = true;
             return TokenType::BOOL;

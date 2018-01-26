@@ -42,6 +42,7 @@ enum class TokenType {
 
 enum class DataType {
     DT_VOID,
+    DT_BOOL,
     DT_INT,
     DT_CHAR
 };
