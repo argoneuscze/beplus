@@ -57,13 +57,13 @@ void SimpleInterpreter::visit(ASTFunction* func) {
         throw InterpreterException(err);
     }
 
-    // Necessary, otherwise the moving of *func can nullify prototype/func.
+    // Necessary, otherwise the moving of *func can nullify prototype/func
+    // if used in the assignment.
     auto name = func->getPrototype()->getName();
 
     FunctionTable[name] = std::make_unique<ASTFunction>(std::move(*func));
 }
 
-// TODO remove visiting prototype
 void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
     std::cout << "[SimInt] Visiting ASTFunctionPrototype" << std::endl;
 }
@@ -118,6 +118,12 @@ void SimpleInterpreter::visit(ASTExpressionCallBuiltin* call) {
     std::cout << "[SimInt] Visiting a builtin call" << std::endl;
     if (call->getName() == "print")
         builtinPrint(call);
+    else if (call->getName() == "readInput")
+        builtinReadInput(call);
+    else {
+        std::string err = "Unknown builtin function " + call->getName();
+        throw InterpreterException(err);
+    }
 }
 
 
@@ -288,6 +294,23 @@ void SimpleInterpreter::builtinPrint(ASTExpressionCallBuiltin* call) {
     for (auto& arg : *(call->getArgs())) {
         arg->accept(this);
         std::cout << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
+    }
+}
+
+void SimpleInterpreter::builtinReadInput(ASTExpressionCallBuiltin* call) {
+    std::cout << "[SimInt] Executing builtin readInput()" << std::endl;
+
+    int in;
+
+    for (auto& arg : *(call->getArgs())) {
+      auto var = dynamic_cast<ASTExpressionVariable*>(arg.get());
+      if (var) {
+          std::cin >> in;
+          if(!CurEnv->setVariable(var->getName(), std::make_shared<ValueNumber>(in)))
+              throw InterpreterException("Could not set a variable to its value.");
+      }
+      else
+          throw InterpreterException("Expected a variable as an input reading argument.");
     }
 }
 

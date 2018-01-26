@@ -12,13 +12,12 @@ Parser::Parser(std::istream& input) {
 bool Parser::functionBuiltin(const std::string & name) {
     if (name == "print")
         return true;
-    if (name == "read")
+    if (name == "readInput")
         return true;
 
     return false;
 }
 
-// TODO more possible parsing options? toplevelstatement?
 std::unique_ptr<Module> Parser::parse() {
     LogDebug("Parsing started");
 
@@ -209,6 +208,7 @@ std::unique_ptr<ASTExpressionNumber> Parser::parseNumberExpression() {
     return num;
 }
 
+// TODO check that a variable doesn't clash with a function name
 std::unique_ptr<ASTExpressionVariable> Parser::parseVariableExpression(void) {
     LogDebug("Parsing variable expression");
 
@@ -234,6 +234,7 @@ std::unique_ptr<ASTExpression> Parser::parseParenthesisExpression() {
 }
 
 // function ::= 'def' prototype '{' statement* '}'
+// TODO check there's no function redefinition/trying to overwrite builtins
 void Parser::handleFunction() {
     Lexer->readNextToken(); // eat def
 

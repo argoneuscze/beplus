@@ -64,6 +64,7 @@ public:
 
 private:
     void builtinPrint(ASTExpressionCallBuiltin* call);
+    void builtinReadInput(ASTExpressionCallBuiltin* call);
 
     std::unique_ptr<Environment> GlobalEnv;
     Environment* CurEnv;
