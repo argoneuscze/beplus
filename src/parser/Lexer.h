@@ -26,6 +26,8 @@ enum class TokenType {
     KW_COMMA,
     KW_BINARYOP,
     KW_ASSIGNOP,
+    KW_SUBASSIGN, // -=
+    KW_ADDASSIGN, // +=
 
     // user-defined
     IDENTIFIER,

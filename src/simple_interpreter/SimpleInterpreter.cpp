@@ -5,11 +5,13 @@
 
 #include "../parser/ast/ASTArgument.h"
 #include "../parser/ast/ASTFunction.h"
+#include "../parser/ast/ASTExpressionAddAssign.h"
 #include "../parser/ast/ASTExpressionAssign.h"
 #include "../parser/ast/ASTExpressionBinOp.h"
 #include "../parser/ast/ASTExpressionCall.h"
 #include "../parser/ast/ASTExpressionCallBuiltin.h"
 #include "../parser/ast/ASTExpressionNumber.h"
+#include "../parser/ast/ASTExpressionSubAssign.h"
 #include "../parser/ast/ASTExpressionVariable.h"
 #include "../parser/ast/ASTStatement.h"
 #include "../parser/ast/ASTStatementBlock.h"
@@ -69,6 +71,24 @@ void SimpleInterpreter::visit(ASTFunctionPrototype* prototype) {
 }
 
 void SimpleInterpreter::visit(ASTArgument* arg) {
+}
+
+void SimpleInterpreter::visit(ASTExpressionAddAssign* assign) {
+    std::cout << "[SimInt] Visiting ASTExpressionAddAssign" << std::endl;
+    const auto name = assign->getName();
+
+    auto val1_ptr = CurEnv->getVariable(name);
+    auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
+
+    assign->getExpr()->accept(this);
+    auto val2 = dynamic_cast<ValueNumber*>(CurValue.get());
+
+    if(val1 == nullptr || val2 == nullptr)
+        throw InterpreterException("Unable to perform addition.");
+    auto newVal = std::make_shared<ValueNumber>(val1->getValue() + val2->getValue());
+
+    if(!CurEnv->setVariable(name, newVal))
+        throw InterpreterException("Could not perform add assign to the variable.");
 }
 
 void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
@@ -195,6 +215,26 @@ void SimpleInterpreter::visit(ASTExpressionBinOp* binOp) {
 void SimpleInterpreter::visit(ASTExpressionNumber* num) {
     std::cout << "[SimInt] Visiting an ASTExpressionNumber" << std::endl;
     CurValue = std::make_shared<ValueNumber>(num->getValue());
+}
+
+// TODO code refactorization - ASTExpressionAddAssign does p much the same
+//      thing, make them the same node?
+void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
+    std::cout << "[SimInt] Visiting ASTExpressionSubAssign" << std::endl;
+    const auto name = assign->getName();
+
+    auto val1_ptr = CurEnv->getVariable(name);
+    auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
+
+    assign->getExpr()->accept(this);
+    auto val2 = dynamic_cast<ValueNumber*>(CurValue.get());
+
+    if (val1 == nullptr || val2 == nullptr)
+        throw InterpreterException("Unable to perform subtraction.");
+    auto newVal = std::make_shared<ValueNumber>(val1->getValue() - val2->getValue());
+
+    if (!CurEnv->setVariable(name, newVal))
+        throw InterpreterException("Could not perform sub assign to the variable.");
 }
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {

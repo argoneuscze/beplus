@@ -11,6 +11,8 @@ TokenType Lexer::readNextToken() {
 }
 
 TokenType Lexer::getTok() {
+    bool isNeg = false; // unary minus
+
     // skip all whitespaces
     while (isspace(LastChar))
         LastChar = reader.get();
@@ -109,7 +111,7 @@ TokenType Lexer::getTok() {
     LastChar = reader.get();
     switch (ThisChar) {
     case '!':
-        if (LastChar == '=') { // '!=' instead of an unary NOT
+        if (LastChar == '=') { // '!=' instead of a unary NOT
             LastChar = reader.get();
             BinValue = BinOp::OP_NEQL;
             return TokenType::KW_BINARYOP;
@@ -156,9 +158,17 @@ TokenType Lexer::getTok() {
         BinValue = BinOp::OP_GT;
         return TokenType::KW_BINARYOP;
     case '+':
+        if (LastChar == '=') { // '+='
+            LastChar = reader.get();
+            return TokenType::KW_ADDASSIGN;
+        }
         BinValue = BinOp::OP_ADD;
         return TokenType::KW_BINARYOP;
     case '-':
+        if (LastChar == '=') { // '-='
+            LastChar = reader.get();
+            return TokenType::KW_SUBASSIGN;
+        }
         BinValue = BinOp::OP_SUB;
         return TokenType::KW_BINARYOP;
     case '*':

@@ -47,11 +47,13 @@ public:
     void visit(ASTFunction* func) override;
     void visit(ASTFunctionPrototype* prototype) override;
     void visit(ASTArgument* arg) override;
+    void visit(ASTExpressionAddAssign* assign) override;
     void visit(ASTExpressionAssign* assign) override;
     void visit(ASTExpressionBinOp* binOp) override;
     void visit(ASTExpressionCall* call) override;
     void visit(ASTExpressionCallBuiltin* call) override;
     void visit(ASTExpressionNumber* num) override;
+    void visit(ASTExpressionSubAssign* assign) override;
     void visit(ASTExpressionVariable* var) override;
     void visit(ASTBlock* block) override;
     void visit(ASTStatementBlock* block) override;

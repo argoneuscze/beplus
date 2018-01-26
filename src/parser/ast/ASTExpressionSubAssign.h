@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ASTStatement.h"
 #include "ASTExpression.h"
 
-class ASTExpressionAssign : public ASTExpression {
+class ASTExpressionSubAssign : public ASTExpression {
 public:
-    explicit ASTExpressionAssign(const std::string & varName, std::unique_ptr<ASTExpression> expr) : VarName(varName), Expr(std::move(expr)) { }
-    
+    explicit ASTExpressionSubAssign(const std::string & varName, std::unique_ptr<ASTExpression> expr) : VarName(std::move(varName)), Expr(std::move(expr)) {
+    }
+
     void accept(Visitor* v) override {
         v->visit(this);
     }
@@ -21,7 +21,7 @@ public:
 
 protected:
     void print(std::ostream& os) const override {
-        os << "ASTExpressionAssign into: " << VarName;
+        os << "ASTExpressionSubAssign";
     }
 
 private:

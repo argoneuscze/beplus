@@ -121,21 +121,33 @@ std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
 
     if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
         return parseCall(str);
-    else if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP)
+    else if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP || Lexer->getCurToken() == TokenType::KW_ADDASSIGN || Lexer->getCurToken() == TokenType::KW_SUBASSIGN)
         return parseAssignment(str);
     else
         return std::make_unique<ASTExpressionVariable>(str);
 }
 
 // ASSIGN ::= '=' EXPR
-std::unique_ptr<ASTExpressionAssign> Parser::parseAssignment(const std::string & ident) {
+// ASSIGN ::= '+=' EXPR
+// ASSIGN ::= '-=' EXPR
+std::unique_ptr<ASTExpression> Parser::parseAssignment(const std::string & ident) {
     LogDebug("Parsing an assignment");
 
-    Lexer->readNextToken(); // eat '='
+    auto assignop = Lexer->getCurToken();
+    Lexer->readNextToken(); // eat assign op 
 
     auto expr = parseExpression();
 
-    return std::make_unique<ASTExpressionAssign>(ident, std::move(expr));
+    switch (assignop) {
+        case TokenType::KW_ASSIGNOP:
+            return std::make_unique<ASTExpressionAssign>(ident, std::move(expr));
+        case TokenType::KW_ADDASSIGN:
+            return std::make_unique<ASTExpressionAddAssign>(ident, std::move(expr));
+        case TokenType::KW_SUBASSIGN:
+            return std::make_unique<ASTExpressionSubAssign>(ident, std::move(expr));
+        default:
+            throw ParserException("Unknown assignment symbol.");
+    }
 }
 
 // CALL ::= '(' ARGS* ')'
