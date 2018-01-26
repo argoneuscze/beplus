@@ -25,6 +25,5 @@ void startREPL() {
             continue;
 
         interpreter->interpretModule(module.get());
-        //auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
     }
 }

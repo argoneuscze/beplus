@@ -21,6 +21,7 @@
 #include "ast/ASTStatementBlock.h"
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementExpr.h"
+#include "ast/ASTStatementFor.h"
 #include "ast/ASTStatementIf.h"
 #include "ast/ASTStatementReturn.h"
 #include "ast/ASTStatementWhile.h"
@@ -97,6 +98,7 @@ private:
     std::unique_ptr<ASTStatementBlock> parseBlockStatement(void);
     std::unique_ptr<ASTStatementDecl> parseDecl(void);
     std::vector<std::unique_ptr<ASTStatementElsif>> parseElsif(void);
+    std::unique_ptr<ASTStatementFor> parseFor(void);
     std::unique_ptr<ASTStatementIf> parseIf(void);
     std::unique_ptr<ASTStatementReturn> parseReturn(void);
     std::unique_ptr<ASTStatementWhile> parseWhile(void);

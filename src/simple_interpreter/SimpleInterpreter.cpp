@@ -239,6 +239,10 @@ void SimpleInterpreter::visit(ASTStatementExpr* expr) {
     expr->getExpr()->accept(this);
 }
 
+void SimpleInterpreter::visit(ASTStatementFor* forExpr) {
+    std::cout << "[SimInt] Visiting an ASTStatementFor" << std::endl;
+}
+
 void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
     std::cout << "[SimInt] Visiting an if statement" << std::endl;
     ifStmt->getCond()->accept(this);

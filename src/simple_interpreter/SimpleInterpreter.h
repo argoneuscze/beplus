@@ -58,6 +58,7 @@ public:
     void visit(ASTStatementDecl* decl) override;
     void visit(ASTStatementElsif* elsif) override;
     void visit(ASTStatementExpr* expr) override;
+    void visit(ASTStatementFor* forExpr) override;
     void visit(ASTStatementIf* ifStmt) override;
     void visit(ASTStatementReturn* ret) override;
     void visit(ASTStatementWhile* whileStmt) override;

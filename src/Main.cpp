@@ -18,7 +18,9 @@ void runParser(const char* filename) {
     if (!module)
         return;
 
-    auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
+    auto interpreter = std::make_unique<SimpleInterpreter>();
+    interpreter->interpretModule(module.get());
+    //auto interpreter = std::make_unique<SimpleInterpreter>(module.get());
 
     file.close();
 }

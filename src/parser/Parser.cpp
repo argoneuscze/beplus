@@ -467,11 +467,54 @@ std::unique_ptr<ASTStatementReturn> Parser::parseReturn(void) {
     return std::make_unique<ASTStatementReturn>(std::move(expr));
 }
 
+// TODO allow for to have uninitialized exprs?
+// FOR ::= '(' EXPR ';' EXPR ';' EXPR ')' STMT
+std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
+    LogDebug("Parsing a for statement");
+
+    Lexer->readNextToken(); // eat 'for'
+
+    if (Lexer->getCurToken() != TokenType::KW_LEFTBRACKET) {
+        Err = "Expected '(' after a for statement, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat '('
+
+    auto init = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        Err = "Expected ';' after a for initiation, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ';'
+
+    auto cond = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        Err = "Expected ';' after a for condition, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ';'
+
+    auto iter = parseExpression();
+
+    if (Lexer->getCurToken() != TokenType::KW_RIGHTBRACKET) {
+        Err = "Expected ')' at the end of a for statement, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ')'
+
+    auto stmt = parseStatement();
+
+    return std::make_unique<ASTStatementFor>(std::move(init), std::move(cond), std::move(iter), std::move(stmt));
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
 // statement ::= EXPR ';'
 // statament ::= IF
+// statement ::= FOR
 // statement ::= WHILE
 // statement ::= BLOCK 
 // statement ::= RETURN
@@ -484,6 +527,11 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // DECL ::= DATATYPE IDENT
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
+    }
+    // FOR ::= 'for'
+    else if (Lexer->getCurToken() == TokenType::KW_FOR) {
+        stmt = parseFor();
+        return stmt; 
     }
     // IF ::= 'if'
     else if (Lexer->getCurToken() == TokenType::KW_IF) {
