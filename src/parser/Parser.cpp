@@ -531,6 +531,45 @@ std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
     return std::make_unique<ASTStatementFor>(std::move(init), std::move(cond), std::move(iter), std::move(stmt));
 }
 
+// STRUCT ::= 'struct' IDENT '{' (DECL ';')* '}'
+std::unique_ptr<ASTStatementStructDecl> Parser::parseStruct(void) {
+    LogDebug("Parsing a struct declaration.");
+
+    Lexer->readNextToken(); // eat 'struct'
+    if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
+        Err = "Expected an identifier after 'struct', instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    auto id = Lexer->getStrValue();
+
+    Lexer->readNextToken(); // eat IDENT
+
+    if (Lexer->getCurToken() != TokenType::KW_LEFTCURLYBRACKET) {
+        Err = "Expected '{' in a struct, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat '{'
+
+    std::vector<std::unique_ptr<ASTStatementDecl>> decls;
+    while(Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
+        if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
+            Err = "Expected a datatype as a part of a declaration, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+
+        decls.push_back(std::move(parseDecl()));
+
+        if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+            Err = "Expected a ';' at the end of a declaration, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+        Lexer->readNextToken(); // eat ';'
+    }
+    Lexer->readNextToken(); // eat '}'
+
+    return std::make_unique<ASTStatementStructDecl>(id, decls);
+}
+
 // statement ::= DECL ';'
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
@@ -540,6 +579,7 @@ std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
 // statement ::= WHILE
 // statement ::= BLOCK 
 // statement ::= RETURN
+// statement ::= STRUCT
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
 std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
@@ -549,6 +589,11 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // DECL ::= DATATYPE IDENT
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
+    }
+    // STRUCT ::= 'struct'
+    else if (Lexer->getCurToken() == TokenType::KW_STRUCT) {
+        stmt = parseStruct();
+        return stmt;
     }
     // FOR ::= 'for'
     else if (Lexer->getCurToken() == TokenType::KW_FOR) {

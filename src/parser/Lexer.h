@@ -6,6 +6,7 @@ enum class TokenType {
     // language keywords
     KW_DEF,
     KW_DATATYPE,
+    KW_STRUCT,
     KW_IF,
     KW_ELSE,
     KW_ELSIF,

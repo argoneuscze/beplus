@@ -342,6 +342,10 @@ void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {
     }
 }
 
+void SimpleInterpreter::visit(ASTStatementStructDecl* decl) {
+    std::cout << "[SimInt] Visiting a struct decl" << std::endl;
+}
+
 void SimpleInterpreter::interpret() {
     try {
         Module->accept(this);

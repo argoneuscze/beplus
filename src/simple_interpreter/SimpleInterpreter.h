@@ -65,6 +65,7 @@ public:
     void visit(ASTStatementIf* ifStmt) override;
     void visit(ASTStatementReturn* ret) override;
     void visit(ASTStatementWhile* whileStmt) override;
+    void visit(ASTStatementStructDecl* decl) override;
 
 private:
     void builtinPrint(ASTExpressionCallBuiltin* call);
@@ -77,6 +78,7 @@ private:
     std::shared_ptr<Value> CurValue;
 
     std::map<std::string, std::unique_ptr<ASTFunction>> FunctionTable;
+    //std::map<std::string, std::unique_ptr<ASTStatementStruct>> StructTable;
 
     void interpret();
 };
