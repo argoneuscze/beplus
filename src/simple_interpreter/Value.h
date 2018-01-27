@@ -1,5 +1,8 @@
 #pragma once
 
+#include <map>
+#include <memory>
+
 class Value {
 public:
     Value() = default;
@@ -28,4 +31,13 @@ public:
 
 private:
     const long Value;
+};
+
+class ValueStruct : public Value {
+public:
+    explicit ValueStruct(std::map<std::string, std::unique_ptr<Value>> & values) : Values(std::move(values)) {
+    }
+
+private:
+    const std::map<std::string, std::unique_ptr<Value>> Values;
 };

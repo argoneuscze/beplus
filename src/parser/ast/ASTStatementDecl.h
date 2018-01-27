@@ -16,12 +16,16 @@ public:
         return Ident;
     }
 
+    const DataType & getType(void) const {
+        return Type;
+    }
+
 protected:
     void print(std::ostream& os) const override {
         os << "VAR DECL OF " << " " << Ident;
     }
 
 private:
-    DataType Type;
+    const DataType Type;
     const std::string Ident;
 };

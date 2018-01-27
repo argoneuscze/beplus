@@ -102,7 +102,7 @@ private:
 
     std::unique_ptr<ASTStatement> parseStatement(void);
     std::unique_ptr<ASTStatementBlock> parseBlockStatement(void);
-    std::unique_ptr<ASTStatementDecl> parseDecl(void);
+    std::unique_ptr<ASTStatement> parseDecl(void);
     std::vector<std::unique_ptr<ASTStatementElsif>> parseElsif(void);
     std::unique_ptr<ASTStatementFor> parseFor(void);
     std::unique_ptr<ASTStatementIf> parseIf(void);

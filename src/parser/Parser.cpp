@@ -1,5 +1,6 @@
 #include <string> // string concat - error output
 #include <cassert>
+#include <iostream> // [DBG]
 
 #include "Parser.h"
 
@@ -351,11 +352,15 @@ std::vector<std::unique_ptr<ASTArgument>> Parser::parseArguments() {
     }
 }
 
-// DECL ::= DATATYPE IDENT
-std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
+// DECL ::= DATATYPE IDENT ';'
+// DECL ::= 'struct'
+std::unique_ptr<ASTStatement> Parser::parseDecl(void) {
     LogDebug("Parsing a declaration");
 
     auto type = Lexer->getDataType(); // datatype already checked by caller
+    if (type == DataType::DT_STRUCT) {
+        return parseStruct();
+    }
     Lexer->readNextToken(); // eat DATATYPE
 
     if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
@@ -365,6 +370,12 @@ std::unique_ptr<ASTStatementDecl> Parser::parseDecl(void) {
 
     std::string ident = Lexer->getStrValue();
     Lexer->readNextToken(); // eat IDENT
+
+    if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+        Err = "Expected a ';' at the end of a declaration, instead got: " + Lexer->getCurSymbol();
+        throw ParserException(Err);
+    }
+    Lexer->readNextToken(); // eat ';'
 
     return std::make_unique<ASTStatementDecl>(type, ident.c_str());
 }
@@ -532,7 +543,7 @@ std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
 }
 
 // STRUCTDECL ::= 'struct' IDENT '{' (DECL ';')* '}'
-// STRUCTINIT ::= 'struct' IDENT ';'
+// STRUCTINIT ::= 'struct' IDENT
 std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
     LogDebug("Parsing a struct declaration.");
 
@@ -547,7 +558,6 @@ std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
 
     if (Lexer->getCurToken() == TokenType::KW_SEMICOLON) {
         Lexer->readNextToken(); // eat ';'
-
         return std::make_unique<ASTStatementStructInit>(id);
     }
 
@@ -559,25 +569,20 @@ std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
 
     std::vector<std::unique_ptr<ASTStatementDecl>> decls;
     while(Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
-        if (Lexer->getCurToken() != TokenType::KW_DATATYPE) {
-            Err = "Expected a datatype as a part of a declaration, instead got: " + Lexer->getCurSymbol();
-            throw ParserException(Err);
-        }
+        auto stmt = parseDecl();
 
-        decls.push_back(std::move(parseDecl()));
+        // parseDecl() returns ASTStatement - have to cast and release uniq ptr
+        std::unique_ptr<ASTStatementDecl> declUniq(dynamic_cast<ASTStatementDecl*>(stmt.get()));
+        stmt.release();
 
-        if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
-            Err = "Expected a ';' at the end of a declaration, instead got: " + Lexer->getCurSymbol();
-            throw ParserException(Err);
-        }
-        Lexer->readNextToken(); // eat ';'
+        decls.push_back(std::move(declUniq));
     }
     Lexer->readNextToken(); // eat '}'
 
     return std::make_unique<ASTStatementStructDecl>(id, decls);
 }
 
-// statement ::= DECL ';'
+// statement ::= DECL
 // statement ::= ASSIGN ';'
 // statement ::= CALL ';'
 // statement ::= EXPR ';'
@@ -586,7 +591,6 @@ std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
 // statement ::= WHILE
 // statement ::= BLOCK 
 // statement ::= RETURN
-// statement ::= STRUCT
 // Not possible to perform this as a switch/case sequence as decl + assignment
 // is necessary inside of the if block.
 std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
@@ -596,10 +600,6 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
     // DECL ::= DATATYPE IDENT
     if (Lexer->getCurToken() == TokenType::KW_DATATYPE) {
         stmt = parseDecl();
-    }
-    // STRUCT ::= 'struct'
-    else if (Lexer->getCurToken() == TokenType::KW_STRUCT) {
-        stmt = parseStruct();
         return stmt;
     }
     // FOR ::= 'for'

@@ -53,8 +53,10 @@ TokenType Lexer::getTok() {
             return TokenType::KW_RETURN;
         if (LowerCase == "const")
             return TokenType::KW_CONST;
-        if (LowerCase == "struct")
-            return TokenType::KW_STRUCT;
+        if (LowerCase == "struct") {
+            DtValue = DataType::DT_STRUCT;
+            return TokenType::KW_DATATYPE;
+        }
         if (LowerCase == "void") {
             DtValue = DataType::DT_VOID;
             return TokenType::KW_DATATYPE;
