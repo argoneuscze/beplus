@@ -29,6 +29,7 @@
 #include "ast/ASTStatementReturn.h"
 #include "ast/ASTStatementWhile.h"
 #include "ast/ASTStatementStructDecl.h"
+#include "ast/ASTStatementStructInit.h"
 #include "ast/Module.h"
 
 class ParserException : std::exception {
@@ -106,7 +107,7 @@ private:
     std::unique_ptr<ASTStatementFor> parseFor(void);
     std::unique_ptr<ASTStatementIf> parseIf(void);
     std::unique_ptr<ASTStatementReturn> parseReturn(void);
-    std::unique_ptr<ASTStatementStructDecl> parseStruct(void);
+    std::unique_ptr<ASTStatement> parseStruct(void);
     std::unique_ptr<ASTStatementWhile> parseWhile(void);
 
     std::unique_ptr<ASTBlock> parseBlock();

@@ -342,8 +342,33 @@ void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {
     }
 }
 
+
+/*// Visiting function node in the parser only leads to saving the function
+// into the function table. Call node takes care of actual calling
+// and dealing with arguments and the block.
+void SimpleInterpreter::visit(ASTFunction* func) {
+    std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
+
+    auto fn = FunctionTable.find(func->getPrototype()->getName());
+
+    if (fn != FunctionTable.end()) {
+        std::string err = "Function " + func->getPrototype()->getName() + " already exists in the table.";
+        throw InterpreterException(err);
+    }
+
+    // Necessary, otherwise the moving of *func can nullify prototype/func
+    // if used in the assignment.
+    auto name = func->getPrototype()->getName();
+
+    FunctionTable[name] = std::make_unique<ASTFunction>(std::move(*func));
+}*/
+
 void SimpleInterpreter::visit(ASTStatementStructDecl* decl) {
     std::cout << "[SimInt] Visiting a struct decl" << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTStatementStructInit* init) {
+    std::cout << "[SimInt] Visiting a struct init" << std::endl;
 }
 
 void SimpleInterpreter::interpret() {

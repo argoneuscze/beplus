@@ -24,6 +24,7 @@ class ASTStatementFor;
 class ASTStatementIf;
 class ASTStatementReturn;
 class ASTStatementStructDecl;
+class ASTStatementStructInit;
 class ASTStatementWhile;
 
 class Visitor {
@@ -58,6 +59,7 @@ public:
     virtual void visit(ASTStatementReturn* ret) = 0;
     virtual void visit(ASTStatementWhile* whileStmt) = 0;
     virtual void visit(ASTStatementStructDecl* decl) = 0;
+    virtual void visit(ASTStatementStructInit* init) = 0;
 };
 
 class Visitable {

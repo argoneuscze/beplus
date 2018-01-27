@@ -531,8 +531,9 @@ std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
     return std::make_unique<ASTStatementFor>(std::move(init), std::move(cond), std::move(iter), std::move(stmt));
 }
 
-// STRUCT ::= 'struct' IDENT '{' (DECL ';')* '}'
-std::unique_ptr<ASTStatementStructDecl> Parser::parseStruct(void) {
+// STRUCTDECL ::= 'struct' IDENT '{' (DECL ';')* '}'
+// STRUCTINIT ::= 'struct' IDENT ';'
+std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
     LogDebug("Parsing a struct declaration.");
 
     Lexer->readNextToken(); // eat 'struct'
@@ -543,6 +544,12 @@ std::unique_ptr<ASTStatementStructDecl> Parser::parseStruct(void) {
     auto id = Lexer->getStrValue();
 
     Lexer->readNextToken(); // eat IDENT
+
+    if (Lexer->getCurToken() == TokenType::KW_SEMICOLON) {
+        Lexer->readNextToken(); // eat ';'
+
+        return std::make_unique<ASTStatementStructInit>(id);
+    }
 
     if (Lexer->getCurToken() != TokenType::KW_LEFTCURLYBRACKET) {
         Err = "Expected '{' in a struct, instead got: " + Lexer->getCurSymbol();
