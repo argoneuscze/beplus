@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "../common/Types.h"
 
 enum class TokenType {
     // language keywords
@@ -39,14 +40,6 @@ enum class TokenType {
     // other
     EOFTOK,
     INVALID_TOK
-};
-
-enum class DataType {
-    DT_STRUCT,
-    DT_VOID,
-    DT_BOOL,
-    DT_INT,
-    DT_CHAR
 };
 
 enum class BinOp {
