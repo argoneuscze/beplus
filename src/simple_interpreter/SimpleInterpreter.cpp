@@ -23,6 +23,7 @@
 #include "../parser/ast/ASTStatementIf.h"
 #include "../parser/ast/ASTStatementReturn.h"
 #include "../parser/ast/ASTStatementStructDecl.h"
+#include "../parser/ast/ASTStatementStructInit.h"
 #include "../parser/ast/ASTStatementWhile.h"
 #include "../parser/ast/ASTBlock.h"
 
@@ -382,6 +383,13 @@ void SimpleInterpreter::visit(ASTStatementStructDecl* decl) {
 
 void SimpleInterpreter::visit(ASTStatementStructInit* init) {
     std::cout << "[SimInt] Visiting a struct init" << std::endl;
+
+    auto strctIter = StructTable.find(init->getStructName());
+
+    if (strctIter == StructTable.end()) {
+        std::string err = "Structure " + init->getStructName() + " does not exist in the struct table.";
+        throw InterpreterException(err);
+    }
 }
 
 void SimpleInterpreter::interpret() {

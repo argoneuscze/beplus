@@ -558,8 +558,8 @@ std::unique_ptr<ASTStatementFor> Parser::parseFor(void) {
     return std::make_unique<ASTStatementFor>(std::move(init), std::move(cond), std::move(iter), std::move(stmt));
 }
 
-// STRUCTDECL ::= 'struct' IDENT '{' (DECL ';')* '}'
-// STRUCTINIT ::= 'struct' IDENT
+// STRUCTDECL ::= 'struct' IDENT '{' DECL* '}'
+// STRUCTINIT ::= 'struct' IDENT IDENT ';'
 std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
     LogDebug("Parsing a struct declaration.");
 
@@ -572,9 +572,17 @@ std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
 
     Lexer->readNextToken(); // eat IDENT
 
-    if (Lexer->getCurToken() == TokenType::KW_SEMICOLON) {
+    if (Lexer->getCurToken() == TokenType::IDENTIFIER) {
+        auto str = Lexer->getStrValue();
+        Lexer->readNextToken(); // eat IDENT
+
+        if (Lexer->getCurToken() != TokenType::KW_SEMICOLON) {
+            Err = "Expected ';' at the end of struct init, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
         Lexer->readNextToken(); // eat ';'
-        return std::make_unique<ASTStatementStructInit>(id);
+
+        return std::make_unique<ASTStatementStructInit>(id, str);
     }
 
     if (Lexer->getCurToken() != TokenType::KW_LEFTCURLYBRACKET) {

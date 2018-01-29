@@ -4,15 +4,19 @@
 
 class ASTStatementStructInit : public ASTStatement {
 public:
-    explicit ASTStatementStructInit(const std::string & name) : Name(name) {
+    explicit ASTStatementStructInit(const std::string & structName, const std::string & objName) : StructName(structName), ObjName(objName) {
     }
 
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    const std::string & getName(void) const {
-        return Name; 
+    const std::string & getObjName(void) const {
+        return ObjName; 
+    }
+
+    const std::string & getStructName(void) const {
+        return StructName;
     }
 
 protected:
@@ -21,5 +25,6 @@ protected:
     }
 
 private:
-    const std::string Name;
+    const std::string StructName;
+    const std::string ObjName;
 };
