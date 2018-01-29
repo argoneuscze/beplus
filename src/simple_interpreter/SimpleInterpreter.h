@@ -44,9 +44,10 @@ public:
     void interpretModule(Module* module);
 
     void visit(Module* module) override;
+    void visit(ASTArgument* arg) override;
+    void visit(ASTBlock* block) override;
     void visit(ASTFunction* func) override;
     void visit(ASTFunctionPrototype* prototype) override;
-    void visit(ASTArgument* arg) override;
     void visit(ASTExpressionAddAssign* assign) override;
     void visit(ASTExpressionAssign* assign) override;
     void visit(ASTExpressionBinOp* binOp) override;
@@ -56,7 +57,7 @@ public:
     void visit(ASTExpressionNumber* num) override;
     void visit(ASTExpressionSubAssign* assign) override;
     void visit(ASTExpressionVariable* var) override;
-    void visit(ASTBlock* block) override;
+    void visit(ASTIdentVariable* id) override;
     void visit(ASTStatementBlock* block) override;
     void visit(ASTStatementDecl* decl) override;
     void visit(ASTStatementElsif* elsif) override;
@@ -79,7 +80,7 @@ private:
     std::shared_ptr<Value> CurValue;
 
     std::map<std::string, std::unique_ptr<ASTFunction>> FunctionTable;
-    //std::map<std::string, std::unique_ptr<ASTStatementStruct>> StructTable;
+    std::map<std::string, std::unique_ptr<ASTStatementStructDecl>> StructTable;
 
     void interpret();
 };

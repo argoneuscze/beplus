@@ -140,6 +140,8 @@ TokenType Lexer::getTok() {
         return TokenType::KW_COLON;
     case ',':
         return TokenType::KW_COMMA;
+    case '.':
+        return TokenType::KW_DOT;
     case '=':
         if (LastChar == '=') { // '==' instead of '='
             LastChar = reader.get();

@@ -22,6 +22,7 @@
 #include "../parser/ast/ASTStatementFor.h"
 #include "../parser/ast/ASTStatementIf.h"
 #include "../parser/ast/ASTStatementReturn.h"
+#include "../parser/ast/ASTStatementStructDecl.h"
 #include "../parser/ast/ASTStatementWhile.h"
 #include "../parser/ast/ASTBlock.h"
 
@@ -77,9 +78,13 @@ void SimpleInterpreter::visit(ASTArgument* arg) {
 
 void SimpleInterpreter::visit(ASTExpressionAddAssign* assign) {
     std::cout << "[SimInt] Visiting ASTExpressionAddAssign" << std::endl;
-    const auto name = assign->getName();
+    const auto var = assign->getIdent()->getVarName();
+    const auto attr = assign->getIdent()->getAttrName();
 
-    auto val1_ptr = CurEnv->getVariable(name);
+    if (attr != "")
+        throw InterpreterException("Struct attr addassign not implemented.");
+
+    auto val1_ptr = CurEnv->getVariable(var);
     auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     assign->getExpr()->accept(this);
@@ -89,17 +94,22 @@ void SimpleInterpreter::visit(ASTExpressionAddAssign* assign) {
         throw InterpreterException("Unable to perform addition.");
     auto newVal = std::make_shared<ValueNumber>(val1->getValue() + val2->getValue());
 
-    if(!CurEnv->setVariable(name, newVal))
+    if(!CurEnv->setVariable(var, newVal))
         throw InterpreterException("Could not perform add assign to the variable.");
 }
 
 void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
     std::cout << "[SimInt] Visiting an assignment" << std::endl;
-    const auto name = assign->getName();
+    const auto var = assign->getIdent()->getVarName();
+    const auto attr = assign->getIdent()->getAttrName();
+
+    if (attr != "")
+        throw InterpreterException("Struct attr assignment not implemented.");
+
     assign->getExpr()->accept(this);
     const auto val_ptr = CurValue;
 
-    if(!CurEnv->setVariable(name, val_ptr))
+    if(!CurEnv->setVariable(var, val_ptr))
         throw InterpreterException("Could not set a variable to its value.");
 }
 
@@ -227,9 +237,13 @@ void SimpleInterpreter::visit(ASTExpressionNumber* num) {
 //      thing, make them the same node?
 void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
     std::cout << "[SimInt] Visiting ASTExpressionSubAssign" << std::endl;
-    const auto name = assign->getName();
+    const auto var = assign->getIdent()->getVarName();
+    const auto attr = assign->getIdent()->getAttrName();
 
-    auto val1_ptr = CurEnv->getVariable(name);
+    if (attr != "")
+        throw InterpreterException("Struct subassign not implemented.");
+
+    auto val1_ptr = CurEnv->getVariable(var);
     auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     assign->getExpr()->accept(this);
@@ -239,14 +253,21 @@ void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
         throw InterpreterException("Unable to perform subtraction.");
     auto newVal = std::make_shared<ValueNumber>(val1->getValue() - val2->getValue());
 
-    if (!CurEnv->setVariable(name, newVal))
+    if (!CurEnv->setVariable(var, newVal))
         throw InterpreterException("Could not perform sub assign to the variable.");
 }
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
-    CurValue = CurEnv->getVariable(var->getName());
+    if (var->getIdent()->getAttrName() != "")
+        throw InterpreterException("Struct attributes not implemented yet.");
+
+    CurValue = CurEnv->getVariable(var->getIdent()->getVarName());
     std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
+}
+
+void SimpleInterpreter::visit(ASTIdentVariable* id) {
+    std::cout << "[SimInt] Visiting an ASTIdentVariable" << std::endl;
 }
 
 void SimpleInterpreter::visit(ASTBlock* block) {
@@ -343,28 +364,20 @@ void SimpleInterpreter::visit(ASTStatementWhile* whileStmt) {
 }
 
 
-/*// Visiting function node in the parser only leads to saving the function
-// into the function table. Call node takes care of actual calling
-// and dealing with arguments and the block.
-void SimpleInterpreter::visit(ASTFunction* func) {
-    std::cout << "[SimInt] Visiting ASTFunction" << std::endl;
+// Similar to visiting ASTFunction.
+void SimpleInterpreter::visit(ASTStatementStructDecl* decl) {
+    std::cout << "[SimInt] Visiting a struct decl" << std::endl;
 
-    auto fn = FunctionTable.find(func->getPrototype()->getName());
+    auto strctIter = StructTable.find(decl->getName());
 
-    if (fn != FunctionTable.end()) {
-        std::string err = "Function " + func->getPrototype()->getName() + " already exists in the table.";
+    if (strctIter != StructTable.end()) {
+        std::string err = "Structure " + decl->getName() + " already exists in the struct table.";
         throw InterpreterException(err);
     }
 
-    // Necessary, otherwise the moving of *func can nullify prototype/func
-    // if used in the assignment.
-    auto name = func->getPrototype()->getName();
+    auto name = decl->getName();
 
-    FunctionTable[name] = std::make_unique<ASTFunction>(std::move(*func));
-}*/
-
-void SimpleInterpreter::visit(ASTStatementStructDecl* decl) {
-    std::cout << "[SimInt] Visiting a struct decl" << std::endl;
+    StructTable[name] = std::make_unique<ASTStatementStructDecl>(std::move(*decl));
 }
 
 void SimpleInterpreter::visit(ASTStatementStructInit* init) {
@@ -389,6 +402,7 @@ void SimpleInterpreter::builtinPrint(ASTExpressionCallBuiltin* call) {
     }
 }
 
+// TODO read into a struct attr
 void SimpleInterpreter::builtinReadInput(ASTExpressionCallBuiltin* call) {
     std::cout << "[SimInt] Executing builtin readInput()" << std::endl;
 
@@ -398,7 +412,7 @@ void SimpleInterpreter::builtinReadInput(ASTExpressionCallBuiltin* call) {
       auto var = dynamic_cast<ASTExpressionVariable*>(arg.get());
       if (var) {
           std::cin >> in;
-          if(!CurEnv->setVariable(var->getName(), std::make_shared<ValueNumber>(in)))
+          if(!CurEnv->setVariable(var->getIdent()->getVarName(), std::make_shared<ValueNumber>(in)))
               throw InterpreterException("Could not set a variable to its value.");
       }
       else

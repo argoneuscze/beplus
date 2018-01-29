@@ -1,9 +1,10 @@
 #pragma once
 
 class Module;
+class ASTArgument;
+class ASTBlock;
 class ASTFunction;
 class ASTFunctionPrototype;
-class ASTArgument;
 class ASTExpressionAddAssign;
 class ASTExpressionAssign;
 class ASTExpressionBinOp;
@@ -13,7 +14,7 @@ class ASTExpressionCallBuiltin;
 class ASTExpressionNumber;
 class ASTExpressionSubAssign;
 class ASTExpressionVariable;
-class ASTBlock;
+class ASTIdentVariable;
 class ASTStatementBlock;
 class ASTStatementCall;
 class ASTStatementCallBuiltin;
@@ -37,9 +38,10 @@ public:
     Visitor& operator=(Visitor&& other) noexcept = default;
 
     virtual void visit(Module* module) = 0;
+    virtual void visit(ASTArgument* arg) = 0;
+    virtual void visit(ASTBlock* block) = 0;
     virtual void visit(ASTFunction* func) = 0;
     virtual void visit(ASTFunctionPrototype* prototype) = 0;
-    virtual void visit(ASTArgument* arg) = 0;
     virtual void visit(ASTExpressionAddAssign* assign) = 0;
     virtual void visit(ASTExpressionAssign* assign) = 0;
     virtual void visit(ASTExpressionBinOp* arg) = 0;
@@ -49,7 +51,7 @@ public:
     virtual void visit(ASTExpressionNumber* arg) = 0;
     virtual void visit(ASTExpressionSubAssign* assign) = 0;
     virtual void visit(ASTExpressionVariable* var) = 0;
-    virtual void visit(ASTBlock* block) = 0;
+    virtual void visit(ASTIdentVariable* id) = 0;
     virtual void visit(ASTStatementBlock* block) = 0;
     virtual void visit(ASTStatementDecl* decl) = 0;
     virtual void visit(ASTStatementElsif* elsif) = 0;

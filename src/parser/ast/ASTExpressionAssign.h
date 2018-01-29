@@ -1,18 +1,18 @@
 #pragma once
 
-#include "ASTStatement.h"
 #include "ASTExpression.h"
+#include "ASTIdentVariable.h"
 
 class ASTExpressionAssign : public ASTExpression {
 public:
-    explicit ASTExpressionAssign(const std::string & varName, std::unique_ptr<ASTExpression> expr) : VarName(varName), Expr(std::move(expr)) { }
+    explicit ASTExpressionAssign(std::unique_ptr<ASTIdentVariable> ident, std::unique_ptr<ASTExpression> expr) : Ident(std::move(ident)), Expr(std::move(expr)) { }
     
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    const std::string & getName(void) const {
-        return VarName;
+    ASTIdentVariable* getIdent(void) const {
+        return Ident.get();
     }
 
     ASTExpression* getExpr(void) const {
@@ -21,10 +21,10 @@ public:
 
 protected:
     void print(std::ostream& os) const override {
-        os << "ASTExpressionAssign into: " << VarName;
+        os << "ASTExpressionAssign";
     }
 
 private:
-    const std::string VarName;
+    const std::unique_ptr<ASTIdentVariable> Ident;
     const std::unique_ptr<ASTExpression> Expr;
 };

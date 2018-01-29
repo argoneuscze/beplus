@@ -123,6 +123,7 @@ std::unique_ptr<ASTExpressionBool> Parser::parseBoolExpression(void) {
 // a) We're parsing a call
 // b) We're parsing a variable
 // c) We're parsing an assignment
+// d) We're parsing a struct attribute expr
 // in expressions such as 2 + a; 3 + foo(x); and others.
 std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
     LogDebug("Parsing an expression with an ident.");
@@ -131,17 +132,32 @@ std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
     Lexer->readNextToken(); // eat ident
 
     if (Lexer->getCurToken() == TokenType::KW_LEFTBRACKET)
-        return parseCall(str);
-    else if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP || Lexer->getCurToken() == TokenType::KW_ADDASSIGN || Lexer->getCurToken() == TokenType::KW_SUBASSIGN)
-        return parseAssignment(str);
+        return parseCall(str); // no classes - methods do not exist
+
+    std::string attr;
+    if (Lexer->getCurToken() == TokenType::KW_DOT) {
+        Lexer->readNextToken();
+        
+        if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
+            Err = "Expected an identifier as an attribute, instead got: " + Lexer->getCurSymbol();
+            throw ParserException(Err);
+        }
+        attr = Lexer->getStrValue();
+        Lexer->readNextToken(); // end up eating ident
+    }
+
+    auto id = std::make_unique<ASTIdentVariable>(str, attr);
+
+    if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP || Lexer->getCurToken() == TokenType::KW_ADDASSIGN || Lexer->getCurToken() == TokenType::KW_SUBASSIGN)
+        return parseAssignment(id);
     else
-        return std::make_unique<ASTExpressionVariable>(str);
+        return std::make_unique<ASTExpressionVariable>(std::move(id));
 }
 
 // ASSIGN ::= '=' EXPR
 // ASSIGN ::= '+=' EXPR
 // ASSIGN ::= '-=' EXPR
-std::unique_ptr<ASTExpression> Parser::parseAssignment(const std::string & ident) {
+std::unique_ptr<ASTExpression> Parser::parseAssignment(std::unique_ptr<ASTIdentVariable> & astIdent) {
     LogDebug("Parsing an assignment");
 
     auto assignop = Lexer->getCurToken();
@@ -151,11 +167,11 @@ std::unique_ptr<ASTExpression> Parser::parseAssignment(const std::string & ident
 
     switch (assignop) {
         case TokenType::KW_ASSIGNOP:
-            return std::make_unique<ASTExpressionAssign>(ident, std::move(expr));
+            return std::make_unique<ASTExpressionAssign>(std::move(astIdent), std::move(expr));
         case TokenType::KW_ADDASSIGN:
-            return std::make_unique<ASTExpressionAddAssign>(ident, std::move(expr));
+            return std::make_unique<ASTExpressionAddAssign>(std::move(astIdent), std::move(expr));
         case TokenType::KW_SUBASSIGN:
-            return std::make_unique<ASTExpressionSubAssign>(ident, std::move(expr));
+            return std::make_unique<ASTExpressionSubAssign>(std::move(astIdent), std::move(expr));
         default:
             throw ParserException("Unknown assignment symbol.");
     }

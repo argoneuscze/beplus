@@ -8,6 +8,7 @@
 #include "Lexer.h"
 
 #include "ast/ASTArgument.h"
+#include "ast/ASTBlock.h"
 #include "ast/ASTExpression.h"
 #include "ast/ASTFunction.h"
 #include "ast/ASTFunctionPrototype.h"
@@ -20,7 +21,7 @@
 #include "ast/ASTExpressionNumber.h"
 #include "ast/ASTExpressionSubAssign.h"
 #include "ast/ASTExpressionVariable.h"
-#include "ast/ASTBlock.h"
+#include "ast/ASTIdentVariable.h"
 #include "ast/ASTStatementBlock.h"
 #include "ast/ASTStatementDecl.h"
 #include "ast/ASTStatementExpr.h"
@@ -43,7 +44,6 @@ public:
     }
 
 private:
-    //const char* msg;
     std::string msg;
 };
 
@@ -91,7 +91,7 @@ private:
 
     std::unique_ptr<ASTExpression> parseExpression();
     std::unique_ptr<ASTExpression> parsePrimary();
-    std::unique_ptr<ASTExpression> parseAssignment(const std::string & ident);
+    std::unique_ptr<ASTExpression> parseAssignment(std::unique_ptr<ASTIdentVariable> & astIdent);
     std::unique_ptr<ASTExpression> parseBinOpRHS(int prec, std::unique_ptr<ASTExpression> LHS);
     std::unique_ptr<ASTExpressionBool> parseBoolExpression(void);
     std::unique_ptr<ASTExpression> parseCall(const std::string & ident);

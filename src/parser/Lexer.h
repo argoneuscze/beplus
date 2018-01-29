@@ -30,6 +30,7 @@ enum class TokenType {
     KW_ASSIGNOP,
     KW_SUBASSIGN, // -=
     KW_ADDASSIGN, // +=
+    KW_DOT,
 
     // user-defined
     IDENTIFIER,
