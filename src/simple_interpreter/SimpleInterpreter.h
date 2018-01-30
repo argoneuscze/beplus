@@ -9,6 +9,7 @@
 #include "../parser/ast/Module.h"
 
 #include "Environment.h"
+#include "Heap.h"
 #include "Value.h"
 
 class InterpreterException : std::exception {
@@ -75,6 +76,7 @@ private:
 
     std::unique_ptr<Environment> GlobalEnv;
     Environment* CurEnv;
+    Heap Heap;
 
     Module* const Module;
     std::shared_ptr<Value> CurValue;

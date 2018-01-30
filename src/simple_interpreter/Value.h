@@ -35,9 +35,14 @@ private:
 
 class ValueStruct : public Value {
 public:
-    explicit ValueStruct(std::map<std::string, std::unique_ptr<Value>> & values) : Values(std::move(values)) {
+    explicit ValueStruct(std::map<std::string, std::unique_ptr<Value>> & values) : Values(std::move(values)), Mark(0) {
+    }
+
+    int getMark(void) const {
+        return Mark;
     }
 
 private:
     const std::map<std::string, std::unique_ptr<Value>> Values;
+    int Mark;
 };

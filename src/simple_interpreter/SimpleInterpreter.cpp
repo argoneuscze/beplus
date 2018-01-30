@@ -390,6 +390,26 @@ void SimpleInterpreter::visit(ASTStatementStructInit* init) {
         std::string err = "Structure " + init->getStructName() + " does not exist in the struct table.";
         throw InterpreterException(err);
     }
+
+    auto attrDecls = strctIter->second->getDecls();
+
+    std::map<std::string, std::unique_ptr<Value>> attrs;
+
+    for (auto & decl : *attrDecls) {
+        auto type = decl->getType();
+        auto ident = decl->getIdent();
+
+        if (type == DataType::DT_INT)
+            attrs[ident] = std::make_unique<ValueNumber>(0);
+        else
+            throw InterpreterException("Other types unimplemented.");
+    }
+
+    auto strct = std::make_unique<ValueStruct>(attrs);
+
+    Heap.insertValue(std::move(strct));
+
+    Heap.traverse();
 }
 
 void SimpleInterpreter::interpret() {
