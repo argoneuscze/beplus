@@ -59,6 +59,24 @@ std::shared_ptr<Value> Environment::getVariable(const std::string & name) {
     return PrevEnv->getVariable(name);
 }
 
+std::shared_ptr<Value> Environment::getStructAttr(const std::string & structName, const std::string & attrName) {
+    std::cout << "[Env] Trying to find: " << structName << "." << attrName << std::endl;
+
+    const auto val = Variables.find(structName);
+
+    if (val != Variables.end()) {
+        std::cout << "[Env] found struct" << std::endl;
+        return dynamic_cast<ValueStruct*>(val->second.get())->getValue(attrName);
+    }
+    
+    if (!PrevEnv) {
+        std::cout << "[Env] Could not find struct in Env" << std::endl;
+        return nullptr;
+    }
+
+    return PrevEnv->getStructAttr(structName, attrName);
+}
+
 Environment* Environment::fork() {
     auto newEnv = std::make_unique<Environment>(this);
     const auto ret = newEnv.get();

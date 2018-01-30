@@ -260,10 +260,13 @@ void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
-    if (var->getIdent()->getAttrName() != "")
-        throw InterpreterException("Struct attributes not implemented yet.");
+    if (var->getIdent()->getAttrName() != "") {
+        CurValue = CurEnv->getStructAttr(var->getIdent()->getVarName(), var->getIdent()->getAttrName());
+    }
+    else {
+        CurValue = CurEnv->getVariable(var->getIdent()->getVarName());
+    }
 
-    CurValue = CurEnv->getVariable(var->getIdent()->getVarName());
     std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
 }
 
@@ -393,23 +396,24 @@ void SimpleInterpreter::visit(ASTStatementStructInit* init) {
 
     auto attrDecls = strctIter->second->getDecls();
 
-    std::map<std::string, std::unique_ptr<Value>> attrs;
+    std::map<std::string, std::shared_ptr<Value>> attrs;
 
     for (auto & decl : *attrDecls) {
         auto type = decl->getType();
         auto ident = decl->getIdent();
 
         if (type == DataType::DT_INT)
-            attrs[ident] = std::make_unique<ValueNumber>(0);
+            attrs[ident] = std::make_shared<ValueNumber>(0);
         else
             throw InterpreterException("Other types unimplemented.");
     }
 
-    auto strct = std::make_unique<ValueStruct>(attrs);
+    auto strct = std::make_shared<ValueStruct>(attrs);
 
-    Heap.insertValue(std::move(strct));
+    Heap.insertValue(strct);
 
-    Heap.traverse();
+    if (!CurEnv->initVariable(init->getObjName(), strct))
+        throw InterpreterException("Could not initialize struct in the environment.");
 }
 
 void SimpleInterpreter::interpret() {

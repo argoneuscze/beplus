@@ -16,6 +16,8 @@ public:
     bool setVariable(const std::string & name, const std::shared_ptr<Value> value);
     // gets a shared pointer to a variable
     std::shared_ptr<Value> getVariable(const std::string & name);
+    // gets a raw pointer to a struct attribute
+    std::shared_ptr<Value> getStructAttr(const std::string & structName, const std::string & attrName);
 
     // creates and returns a new environment, setting its parent to this one
     Environment* fork();

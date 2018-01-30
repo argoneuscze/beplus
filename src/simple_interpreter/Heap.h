@@ -8,8 +8,8 @@ class Heap {
 public:
     explicit Heap(void) { }
 
-    void insertValue(std::unique_ptr<ValueStruct> valuePtr) {
-        Values.push_back(std::move(valuePtr)); 
+    void insertValue(std::shared_ptr<ValueStruct> valuePtr) {
+        Values.push_back(valuePtr);
     }
 
     // [DBG]
@@ -20,5 +20,5 @@ public:
     }
 
 private:
-    std::list<std::unique_ptr<ValueStruct>> Values;
+    std::list<std::shared_ptr<ValueStruct>> Values;
 };
