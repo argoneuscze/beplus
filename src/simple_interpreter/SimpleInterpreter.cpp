@@ -85,7 +85,7 @@ void SimpleInterpreter::visit(ASTExpressionAddAssign* assign) {
     if (attr != "")
         throw InterpreterException("Struct attr addassign not implemented.");
 
-    auto val1_ptr = CurEnv->getVariable(var);
+    auto val1_ptr = CurEnv->getVariable(var, attr);
     auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     assign->getExpr()->accept(this);
@@ -244,7 +244,7 @@ void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
     if (attr != "")
         throw InterpreterException("Struct subassign not implemented.");
 
-    auto val1_ptr = CurEnv->getVariable(var);
+    auto val1_ptr = CurEnv->getVariable(var, attr);
     auto val1 = dynamic_cast<ValueNumber*>(val1_ptr.get());
 
     assign->getExpr()->accept(this);
@@ -260,12 +260,8 @@ void SimpleInterpreter::visit(ASTExpressionSubAssign* assign) {
 
 void SimpleInterpreter::visit(ASTExpressionVariable* var) {
     std::cout << "[SimInt] Visiting an ASTExpressionVariable" << std::endl;
-    if (var->getIdent()->getAttrName() != "") {
-        CurValue = CurEnv->getStructAttr(var->getIdent()->getVarName(), var->getIdent()->getAttrName());
-    }
-    else {
-        CurValue = CurEnv->getVariable(var->getIdent()->getVarName());
-    }
+
+    CurValue = CurEnv->getVariable(var->getIdent()->getVarName(), var->getIdent()->getAttrName());
 
     std::cout << "[SimInt] ==> " << dynamic_cast<ValueNumber*>(CurValue.get())->getValue() << std::endl;
 }

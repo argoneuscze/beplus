@@ -39,14 +39,16 @@ bool Environment::initVariable(const std::string & name, const std::shared_ptr<V
     }
 }
 
-std::shared_ptr<Value> Environment::getVariable(const std::string & name) {
+std::shared_ptr<Value> Environment::getVariable(const std::string & objName, const std::string & attrName) {
     std::cout << "[Env] Variables.size: " << Variables.size() << std::endl;
-    std::cout << "[Env] Trying to find: " << name << std::endl;
+    std::cout << "[Env] Trying to find: " << objName << "." << attrName << std::endl;
 
-    const auto val = Variables.find(name);
+    const auto val = Variables.find(objName);
     // check if current environment has variable
     if (val != Variables.end()) {
         std::cout << "[Env] Found var" << std::endl;
+        if (attrName != "")
+            return dynamic_cast<ValueStruct*>(val->second.get())->getValue(attrName);
         return val->second;
     }
     // value not found, check parents, if exist
@@ -56,25 +58,7 @@ std::shared_ptr<Value> Environment::getVariable(const std::string & name) {
         return nullptr;
     }
     // otherwise return parent's getVariable
-    return PrevEnv->getVariable(name);
-}
-
-std::shared_ptr<Value> Environment::getStructAttr(const std::string & structName, const std::string & attrName) {
-    std::cout << "[Env] Trying to find: " << structName << "." << attrName << std::endl;
-
-    const auto val = Variables.find(structName);
-
-    if (val != Variables.end()) {
-        std::cout << "[Env] found struct" << std::endl;
-        return dynamic_cast<ValueStruct*>(val->second.get())->getValue(attrName);
-    }
-    
-    if (!PrevEnv) {
-        std::cout << "[Env] Could not find struct in Env" << std::endl;
-        return nullptr;
-    }
-
-    return PrevEnv->getStructAttr(structName, attrName);
+    return PrevEnv->getVariable(objName, attrName);
 }
 
 Environment* Environment::fork() {
