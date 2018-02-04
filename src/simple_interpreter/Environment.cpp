@@ -1,6 +1,7 @@
 #include "Environment.h"
 
 #include <cassert>
+#include <string>
 #include <iostream> // [DBG]
 
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {

@@ -6,7 +6,7 @@ struct myStruct
 
 def main(): int
 {
-  myStruct strct;
+  struct myStruct strct;
   strct.first = 1;
   strct.second = 2;
 
@@ -15,3 +15,5 @@ def main(): int
 
   return 0;
 }
+
+main();
