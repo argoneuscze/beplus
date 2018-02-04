@@ -24,6 +24,9 @@ public:
     // destroys the current environment and returns a pointer to the previous one
     Environment* restorePrev();
 
+    std::vector<std::unique_ptr<Environment>>& getChildren();
+    std::map<std::string, std::shared_ptr<Value>>& getVariables();
+
 private:
     Environment* const PrevEnv;
     std::vector<std::unique_ptr<Environment>> Children;

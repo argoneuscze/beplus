@@ -36,6 +36,8 @@ SimpleInterpreter::SimpleInterpreter(void) : Module(nullptr) {
     std::cout << "[SimInt] Empty constructor called" << std::endl;
 
     GlobalEnv = std::make_unique<Environment>(nullptr);
+    GC = std::make_unique<GarbageCollector>(GlobalEnv.get());
+    Heap.setGarbageCollector(GC.get());
     CurEnv = GlobalEnv.get();
 }
 

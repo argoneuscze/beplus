@@ -84,3 +84,11 @@ Environment* Environment::restorePrev() {
     assert("Previous node doesn't have this one as child" && 0);
     return nullptr;
 }
+
+std::vector<std::unique_ptr<Environment>>& Environment::getChildren() {
+    return this->Children;
+}
+
+std::map<std::string, std::shared_ptr<Value>>& Environment::getVariables() {
+    return this->Variables;
+}

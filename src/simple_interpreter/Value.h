@@ -38,7 +38,11 @@ public:
     explicit ValueStruct(std::map<std::string, std::shared_ptr<Value>> & values) : Values(std::move(values)), Mark(0) {
     }
 
-    int getMark(void) const {
+    void setMark(const bool val) {
+        Mark = val;
+    }
+
+    bool getMark(void) const {
         return Mark;
     }
 
@@ -48,5 +52,5 @@ public:
 
 private:
     const std::map<std::string, std::shared_ptr<Value>> Values;
-    int Mark;
+    bool Mark;
 };

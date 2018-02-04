@@ -76,7 +76,9 @@ private:
 
     std::unique_ptr<Environment> GlobalEnv;
     Environment* CurEnv;
+
     Heap Heap;
+    std::unique_ptr<GarbageCollector> GC;
 
     Module* const Module;
     std::shared_ptr<Value> CurValue;

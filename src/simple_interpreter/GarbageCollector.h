@@ -1,13 +1,23 @@
 #pragma once
 
 #include "Environment.h"
-#include "Heap.h"
+#include <list>
 
 class GarbageCollector {
 public:
-    explicit GarbageCollector(void) { }
+    explicit GarbageCollector(Environment* rootEnv) : Root(rootEnv) {
+    }
 
-    void mark(Heap & heap, Environment & env);
+    void collect(std::list<std::shared_ptr<ValueStruct>>& memory) const {
+        mark();
+        sweep(memory);
+    }
 
-    void sweep(Heap & heap);
+private:
+    void mark() const;
+    void sweep(std::list<std::shared_ptr<ValueStruct>>& memory) const;
+
+    void markEnv(Environment* env) const;
+
+    Environment* Root;
 };
