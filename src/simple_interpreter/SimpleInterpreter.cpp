@@ -106,14 +106,20 @@ void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
     const auto var = assign->getIdent()->getVarName();
     const auto attr = assign->getIdent()->getAttrName();
 
-    if (attr != "")
-        throw InterpreterException("Struct attr assignment not implemented.");
-
     assign->getExpr()->accept(this);
     const auto val_ptr = CurValue;
 
-    if (!CurEnv->setVariable(var, val_ptr))
-        throw InterpreterException("Could not set a variable to its value.");
+    if (attr != "") {
+        auto val = CurEnv->getVariable(var, "");
+        if (auto structVal = dynamic_cast<ValueStruct*>(val.get()))
+            structVal->setValue(attr, val_ptr);
+        else
+            throw InterpreterException("Could not set attribute to its value.");
+    }
+    else {
+        if (!CurEnv->setVariable(var, val_ptr))
+            throw InterpreterException("Could not set a variable to its value.");
+    }
 }
 
 void SimpleInterpreter::visit(ASTExpressionCall* call) {

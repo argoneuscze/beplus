@@ -51,7 +51,11 @@ public:
         return Values.at(name);
     }
 
+    void setValue(const std::string& name, std::shared_ptr<Value> val) {
+        Values[name] = val;
+    }
+
 private:
-    const std::map<std::string, std::shared_ptr<Value>> Values;
+    std::map<std::string, std::shared_ptr<Value>> Values;
     bool Mark;
 };
