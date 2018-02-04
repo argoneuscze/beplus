@@ -2,6 +2,7 @@
 
 #include "Environment.h"
 #include <list>
+#include <iostream>
 
 class GarbageCollector {
 public:
@@ -9,8 +10,12 @@ public:
     }
 
     void collect(std::list<std::shared_ptr<ValueStruct>>& memory) const {
+        std::cout << "[GC] Mark & Sweep started" << std::endl;
+
         mark();
         sweep(memory);
+
+        std::cout << "[GC] Mark & Sweep finished" << std::endl;
     }
 
 private:
