@@ -109,7 +109,7 @@ void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
     assign->getExpr()->accept(this);
     const auto val_ptr = CurValue;
 
-    if (attr != "") {
+    if (!attr.empty()) {
         auto val = CurEnv->getVariable(var, "");
         if (auto structVal = dynamic_cast<ValueStruct*>(val.get()))
             structVal->setValue(attr, val_ptr);
