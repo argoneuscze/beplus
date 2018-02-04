@@ -124,7 +124,7 @@ void SimpleInterpreter::visit(ASTExpressionCall* call) {
         throw InterpreterException(err);
     }
 
-    CurEnv = CurEnv->fork();
+    CurEnv = GlobalEnv->fork();
 
     // TODO resolve args + var names, push them into env
     // TODO check datatypes
