@@ -14,7 +14,7 @@ public:
     }
 
     void insertValue(std::shared_ptr<ValueStruct> valuePtr) {
-        if (GC && Values.size() > GC_MAX_HEAP_SIZE)
+        if (GC && Values.size() >= GC_MAX_HEAP_SIZE)
             GC->collect(std::ref(Values));
         Values.push_back(valuePtr);
     }
