@@ -12,7 +12,7 @@ public:
         v->visit(this);
     }
 
-    ASTExpression * getRetExpr(void) {
+    ASTExpression* getRetExpr(void) {
         return RetExpr.get();
     }
 

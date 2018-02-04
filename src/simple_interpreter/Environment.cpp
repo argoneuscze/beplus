@@ -7,7 +7,7 @@
 Environment::Environment(Environment* prevEnv): PrevEnv(prevEnv) {
 }
 
-bool Environment::setVariable(const std::string & name, const std::shared_ptr<Value> value) {
+bool Environment::setVariable(const std::string& name, const std::shared_ptr<Value> value) {
     const auto val = Variables.find(name);
 
     if (val != Variables.end()) {
@@ -24,7 +24,7 @@ bool Environment::setVariable(const std::string & name, const std::shared_ptr<Va
     return PrevEnv->setVariable(name, value);
 }
 
-bool Environment::initVariable(const std::string & name, const std::shared_ptr<Value> value) {
+bool Environment::initVariable(const std::string& name, const std::shared_ptr<Value> value) {
     std::cout << "[Env] Initializing variable " << name << std::endl;
 
     const auto var = Variables.find(name);
@@ -34,13 +34,11 @@ bool Environment::initVariable(const std::string & name, const std::shared_ptr<V
         std::cout << "[Env] Successfully initialized variable." << std::endl;
         return true;
     }
-    else {
-        std::cout << "[Env] Unable to init variable " << name << " as it already exists in environment." << std::endl;
-        return false;
-    }
+    std::cout << "[Env] Unable to init variable " << name << " as it already exists in environment." << std::endl;
+    return false;
 }
 
-std::shared_ptr<Value> Environment::getVariable(const std::string & objName, const std::string & attrName) {
+std::shared_ptr<Value> Environment::getVariable(const std::string& objName, const std::string& attrName) {
     std::cout << "[Env] Variables.size: " << Variables.size() << std::endl;
     std::cout << "[Env] Trying to find: " << objName << "." << attrName << std::endl;
 

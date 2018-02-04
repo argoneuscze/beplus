@@ -8,10 +8,13 @@ void GarbageCollector::sweep(std::list<std::shared_ptr<ValueStruct>>& memory) co
     auto it = memory.begin();
     while (it != memory.end()) {
         auto valStruct = it->get();
-        if (!valStruct->getMark())
+        if (!valStruct->getMark()) {
             memory.erase(it++);
-        else
+        }
+        else {
+            valStruct->setMark(false);
             ++it;
+        }
     }
 }
 

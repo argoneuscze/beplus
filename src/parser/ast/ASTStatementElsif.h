@@ -2,18 +2,20 @@
 
 class ASTStatementElsif : public ASTStatement {
 public:
-    explicit ASTStatementElsif(std::unique_ptr<ASTExpression> cond, std::unique_ptr<ASTStatement> condExec) : Cond(std::move(cond)), CondExec(std::move(condExec)) {
+    explicit ASTStatementElsif(std::unique_ptr<ASTExpression> cond,
+                               std::unique_ptr<ASTStatement> condExec) : Cond(std::move(cond)),
+                                                                         CondExec(std::move(condExec)) {
     }
 
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    ASTExpression * getCond(void) {
+    ASTExpression* getCond(void) {
         return Cond.get();
     }
 
-    ASTStatement * getCondExec(void) {
+    ASTStatement* getCondExec(void) {
         return CondExec.get();
     }
 

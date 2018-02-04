@@ -25,7 +25,7 @@ private:
 
 class ValueBool : public Value {
 public:
-    explicit ValueBool(const bool val);
+    explicit ValueBool(bool val);
 
     bool getValue(void) const;
 
@@ -35,7 +35,8 @@ private:
 
 class ValueStruct : public Value {
 public:
-    explicit ValueStruct(std::map<std::string, std::shared_ptr<Value>> & values) : Values(std::move(values)), Mark(0) {
+    explicit
+    ValueStruct(std::map<std::string, std::shared_ptr<Value>>& values) : Values(std::move(values)), Mark(false) {
     }
 
     void setMark(const bool val) {
@@ -46,7 +47,7 @@ public:
         return Mark;
     }
 
-    std::shared_ptr<Value> getValue(const std::string & name) const {
+    std::shared_ptr<Value> getValue(const std::string& name) const {
         return Values.at(name);
     }
 

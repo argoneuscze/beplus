@@ -5,26 +5,31 @@
 
 class ASTStatementIf : public ASTStatement {
 public:
-    explicit ASTStatementIf(std::unique_ptr<ASTExpression> cond, std::unique_ptr<ASTStatement> condExec, std::unique_ptr<ASTStatement> elseExec, std::vector<std::unique_ptr<ASTStatementElsif>> elseIfs) : Cond(std::move(cond)), CondExec(std::move(condExec)), ElseExec(std::move(elseExec)), ElseIfs(std::move(elseIfs)) {
+    explicit ASTStatementIf(std::unique_ptr<ASTExpression> cond, std::unique_ptr<ASTStatement> condExec,
+                            std::unique_ptr<ASTStatement> elseExec,
+                            std::vector<std::unique_ptr<ASTStatementElsif>> elseIfs) : Cond(std::move(cond)),
+                                                                                       CondExec(std::move(condExec)),
+                                                                                       ElseExec(std::move(elseExec)),
+                                                                                       ElseIfs(std::move(elseIfs)) {
     }
 
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    ASTExpression * getCond(void) {
+    ASTExpression* getCond(void) {
         return Cond.get();
     }
 
-    ASTStatement * getCondExec(void) {
+    ASTStatement* getCondExec(void) {
         return CondExec.get();
     }
 
-    ASTStatement * getElseExec(void) {
+    ASTStatement* getElseExec(void) {
         return ElseExec.get();
     }
 
-    const std::vector<std::unique_ptr<ASTStatementElsif>> * getElsifs(void) {
+    const std::vector<std::unique_ptr<ASTStatementElsif>>* getElsifs(void) {
         return &ElseIfs;
     }
 

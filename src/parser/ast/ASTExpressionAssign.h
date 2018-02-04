@@ -5,8 +5,10 @@
 
 class ASTExpressionAssign : public ASTExpression {
 public:
-    explicit ASTExpressionAssign(std::unique_ptr<ASTIdentVariable> ident, std::unique_ptr<ASTExpression> expr) : Ident(std::move(ident)), Expr(std::move(expr)) { }
-    
+    explicit ASTExpressionAssign(std::unique_ptr<ASTIdentVariable> ident,
+                                 std::unique_ptr<ASTExpression> expr) : Ident(std::move(ident)), Expr(std::move(expr)) {
+    }
+
     void accept(Visitor* v) override {
         v->visit(this);
     }

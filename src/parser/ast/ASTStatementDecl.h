@@ -12,11 +12,11 @@ public:
         v->visit(this);
     }
 
-    const std::string & getIdent() const {
+    const std::string& getIdent() const {
         return Ident;
     }
 
-    const DataType & getType(void) const {
+    const DataType& getType(void) const {
         return Type;
     }
 

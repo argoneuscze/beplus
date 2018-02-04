@@ -5,7 +5,9 @@
 
 class ASTExpressionSubAssign : public ASTExpression {
 public:
-    explicit ASTExpressionSubAssign(std::unique_ptr<ASTIdentVariable> ident, std::unique_ptr<ASTExpression> expr) : Ident(std::move(ident)), Expr(std::move(expr)) {
+    explicit ASTExpressionSubAssign(std::unique_ptr<ASTIdentVariable> ident,
+                                    std::unique_ptr<ASTExpression> expr) : Ident(std::move(ident)),
+                                                                           Expr(std::move(expr)) {
     }
 
     void accept(Visitor* v) override {

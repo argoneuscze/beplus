@@ -93,11 +93,11 @@ void SimpleInterpreter::visit(ASTExpressionAddAssign* assign) {
     assign->getExpr()->accept(this);
     auto val2 = dynamic_cast<ValueNumber*>(CurValue.get());
 
-    if(val1 == nullptr || val2 == nullptr)
+    if (val1 == nullptr || val2 == nullptr)
         throw InterpreterException("Unable to perform addition.");
     auto newVal = std::make_shared<ValueNumber>(val1->getValue() + val2->getValue());
 
-    if(!CurEnv->setVariable(var, newVal))
+    if (!CurEnv->setVariable(var, newVal))
         throw InterpreterException("Could not perform add assign to the variable.");
 }
 
@@ -112,7 +112,7 @@ void SimpleInterpreter::visit(ASTExpressionAssign* assign) {
     assign->getExpr()->accept(this);
     const auto val_ptr = CurValue;
 
-    if(!CurEnv->setVariable(var, val_ptr))
+    if (!CurEnv->setVariable(var, val_ptr))
         throw InterpreterException("Could not set a variable to its value.");
 }
 
@@ -133,14 +133,14 @@ void SimpleInterpreter::visit(ASTExpressionCall* call) {
     auto argsPrototype = func->second->getPrototype()->getArgs();
     auto argsCall = call->getArgs();
 
-    if(argsCall->size() != argsPrototype->size())
+    if (argsCall->size() != argsPrototype->size())
         throw InterpreterException("Wrong number of arguments when calling function.");
-  
-    for(int i = 0; i < argsCall->size(); i++) {
+
+    for (int i = 0; i < argsCall->size(); i++) {
         auto name = (*argsPrototype)[i]->getName();
         (*argsCall)[i]->accept(this);
 
-        if(!CurEnv->initVariable(name, CurValue))
+        if (!CurEnv->initVariable(name, CurValue))
             throw InterpreterException("Could not initialize a variable in the new environment.");
     }
 
@@ -281,7 +281,6 @@ void SimpleInterpreter::visit(ASTBlock* block) {
         }
     }
     catch (ReturnException& ex) {
-        return;
     }
 }
 
@@ -295,7 +294,7 @@ void SimpleInterpreter::visit(ASTStatementBlock* block) {
 void SimpleInterpreter::visit(ASTStatementDecl* decl) {
     std::cout << "[SimInt] Visiting a declaration" << std::endl;
 
-    if(!CurEnv->initVariable(decl->getIdent(), std::make_shared<ValueNumber>(0)))
+    if (!CurEnv->initVariable(decl->getIdent(), std::make_shared<ValueNumber>(0)))
         throw InterpreterException("Unable to initialize variable.");
 }
 
@@ -332,7 +331,7 @@ void SimpleInterpreter::visit(ASTStatementIf* ifStmt) {
     if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue())
         ifStmt->getCondExec()->accept(this);
     else {
-        for (auto & elsif : *(ifStmt->getElsifs())) {
+        for (auto& elsif : *(ifStmt->getElsifs())) {
             elsif->getCond()->accept(this);
             if (dynamic_cast<ValueNumber*>(CurValue.get())->getValue()) {
                 elsif->getCondExec()->accept(this);
@@ -396,7 +395,7 @@ void SimpleInterpreter::visit(ASTStatementStructInit* init) {
 
     std::map<std::string, std::shared_ptr<Value>> attrs;
 
-    for (auto & decl : *attrDecls) {
+    for (auto& decl : *attrDecls) {
         auto type = decl->getType();
         auto ident = decl->getIdent();
 
@@ -439,14 +438,14 @@ void SimpleInterpreter::builtinReadInput(ASTExpressionCallBuiltin* call) {
     int in;
 
     for (auto& arg : *(call->getArgs())) {
-      auto var = dynamic_cast<ASTExpressionVariable*>(arg.get());
-      if (var) {
-          std::cin >> in;
-          if(!CurEnv->setVariable(var->getIdent()->getVarName(), std::make_shared<ValueNumber>(in)))
-              throw InterpreterException("Could not set a variable to its value.");
-      }
-      else
-          throw InterpreterException("Expected a variable as an input reading argument.");
+        auto var = dynamic_cast<ASTExpressionVariable*>(arg.get());
+        if (var) {
+            std::cin >> in;
+            if (!CurEnv->setVariable(var->getIdent()->getVarName(), std::make_shared<ValueNumber>(in)))
+                throw InterpreterException("Could not set a variable to its value.");
+        }
+        else
+            throw InterpreterException("Expected a variable as an input reading argument.");
     }
 }
 

@@ -28,8 +28,10 @@ enum class TokenType {
     KW_COMMA,
     KW_BINARYOP,
     KW_ASSIGNOP,
-    KW_SUBASSIGN, // -=
-    KW_ADDASSIGN, // +=
+    KW_SUBASSIGN,
+    // -=
+    KW_ADDASSIGN,
+    // +=
     KW_DOT,
 
     // user-defined
@@ -53,7 +55,8 @@ enum class BinOp {
     OP_EQL,
     OP_NEQL,
     OP_LT,
-    OP_LTE, // less than / equal
+    OP_LTE,
+    // less than / equal
     OP_GT,
     OP_GTE // greater than / equal
 };

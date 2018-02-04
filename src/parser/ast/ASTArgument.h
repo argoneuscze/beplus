@@ -14,7 +14,7 @@ public:
         v->visit(this);
     }
 
-    const std::string & getName(void) {
+    const std::string& getName(void) {
         return Name;
     }
 

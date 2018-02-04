@@ -11,19 +11,19 @@
 class ASTExpressionCall : public ASTExpression {
 public:
     explicit ASTExpressionCall(std::string name,
-                              std::vector<std::unique_ptr<ASTExpression>> args) : Args(std::move(args)),
-                                                                                  FnName(std::move(name)) {
+                               std::vector<std::unique_ptr<ASTExpression>> args) : Args(std::move(args)),
+                                                                                   FnName(std::move(name)) {
     }
 
     void accept(Visitor* v) override {
         v->visit(this);
     }
 
-    const std::string & getName(void) {
+    const std::string& getName(void) {
         return FnName;
     }
 
-    const std::vector<std::unique_ptr<ASTExpression>> * getArgs(void) {
+    const std::vector<std::unique_ptr<ASTExpression>>* getArgs(void) {
         return &Args;
     }
 

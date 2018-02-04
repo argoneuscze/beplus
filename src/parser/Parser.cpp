@@ -10,7 +10,7 @@ Parser::Parser(std::istream& input) {
     Lexer = std::make_unique<::Lexer>(input);
 }
 
-bool Parser::functionBuiltin(const std::string & name) {
+bool Parser::functionBuiltin(const std::string& name) {
     if (name == "print")
         return true;
     if (name == "readInput")
@@ -60,7 +60,7 @@ std::unique_ptr<Module> Parser::parse() {
 // by the parsing functions.
 void Parser::handleTopLevelStatement() {
     auto stmt = parseStatement();
-    
+
     LogDebug(stmt.get());
 
     ASTNodes.push_back(std::move(stmt));
@@ -137,7 +137,7 @@ std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
     std::string attr;
     if (Lexer->getCurToken() == TokenType::KW_DOT) {
         Lexer->readNextToken();
-        
+
         if (Lexer->getCurToken() != TokenType::IDENTIFIER) {
             Err = "Expected an identifier as an attribute, instead got: " + Lexer->getCurSymbol();
             throw ParserException(Err);
@@ -148,16 +148,16 @@ std::unique_ptr<ASTExpression> Parser::parseIdentExpression(void) {
 
     auto id = std::make_unique<ASTIdentVariable>(str, attr);
 
-    if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP || Lexer->getCurToken() == TokenType::KW_ADDASSIGN || Lexer->getCurToken() == TokenType::KW_SUBASSIGN)
+    if (Lexer->getCurToken() == TokenType::KW_ASSIGNOP || Lexer->getCurToken() == TokenType::KW_ADDASSIGN || Lexer->
+        getCurToken() == TokenType::KW_SUBASSIGN)
         return parseAssignment(id);
-    else
-        return std::make_unique<ASTExpressionVariable>(std::move(id));
+    return std::make_unique<ASTExpressionVariable>(std::move(id));
 }
 
 // ASSIGN ::= '=' EXPR
 // ASSIGN ::= '+=' EXPR
 // ASSIGN ::= '-=' EXPR
-std::unique_ptr<ASTExpression> Parser::parseAssignment(std::unique_ptr<ASTIdentVariable> & astIdent) {
+std::unique_ptr<ASTExpression> Parser::parseAssignment(std::unique_ptr<ASTIdentVariable>& astIdent) {
     LogDebug("Parsing an assignment");
 
     auto assignop = Lexer->getCurToken();
@@ -166,14 +166,14 @@ std::unique_ptr<ASTExpression> Parser::parseAssignment(std::unique_ptr<ASTIdentV
     auto expr = parseExpression();
 
     switch (assignop) {
-        case TokenType::KW_ASSIGNOP:
-            return std::make_unique<ASTExpressionAssign>(std::move(astIdent), std::move(expr));
-        case TokenType::KW_ADDASSIGN:
-            return std::make_unique<ASTExpressionAddAssign>(std::move(astIdent), std::move(expr));
-        case TokenType::KW_SUBASSIGN:
-            return std::make_unique<ASTExpressionSubAssign>(std::move(astIdent), std::move(expr));
-        default:
-            throw ParserException("Unknown assignment symbol.");
+    case TokenType::KW_ASSIGNOP:
+        return std::make_unique<ASTExpressionAssign>(std::move(astIdent), std::move(expr));
+    case TokenType::KW_ADDASSIGN:
+        return std::make_unique<ASTExpressionAddAssign>(std::move(astIdent), std::move(expr));
+    case TokenType::KW_SUBASSIGN:
+        return std::make_unique<ASTExpressionSubAssign>(std::move(astIdent), std::move(expr));
+    default:
+        throw ParserException("Unknown assignment symbol.");
     }
 }
 
@@ -182,7 +182,7 @@ std::unique_ptr<ASTExpression> Parser::parseAssignment(std::unique_ptr<ASTIdentV
 // to decide whether the statement really is a function call.
 // possible TODO - check the module whether the function prototype actually
 //                 exists and can be satisfied with this call?
-std::unique_ptr<ASTExpression> Parser::parseCall(const std::string & ident) {
+std::unique_ptr<ASTExpression> Parser::parseCall(const std::string& ident) {
     LogDebug("Parsing a call expression");
 
     std::vector<std::unique_ptr<ASTExpression>> args;
@@ -592,7 +592,7 @@ std::unique_ptr<ASTStatement> Parser::parseStruct(void) {
     Lexer->readNextToken(); // eat '{'
 
     std::vector<std::unique_ptr<ASTStatementDecl>> decls;
-    while(Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
+    while (Lexer->getCurToken() != TokenType::KW_RIGHTCURLYBRACKET) {
         auto stmt = parseDecl();
 
         // parseDecl() returns ASTStatement - have to cast and release uniq ptr
@@ -627,36 +627,36 @@ std::unique_ptr<ASTStatement> Parser::parseStatement(void) {
         return stmt;
     }
     // FOR ::= 'for'
-    else if (Lexer->getCurToken() == TokenType::KW_FOR) {
+    if (Lexer->getCurToken() == TokenType::KW_FOR) {
         stmt = parseFor();
-        return stmt; 
+        return stmt;
     }
     // IF ::= 'if'
-    else if (Lexer->getCurToken() == TokenType::KW_IF) {
+    if (Lexer->getCurToken() == TokenType::KW_IF) {
         stmt = parseIf();
         return stmt; // does not end with an ';', no need to keep going
     }
     // WHILE ::= 'while'
-    else if (Lexer->getCurToken() == TokenType::KW_WHILE) {
+    if (Lexer->getCurToken() == TokenType::KW_WHILE) {
         stmt = parseWhile();
         return stmt; // does not end with an ';', no need to keep going
     }
     // BLOCK ::= '{'
-    else if (Lexer->getCurToken() == TokenType::KW_LEFTCURLYBRACKET) {
+    if (Lexer->getCurToken() == TokenType::KW_LEFTCURLYBRACKET) {
         stmt = parseBlockStatement();
         return stmt;
     }
     // RETURN ::= 'return'
-    else if (Lexer->getCurToken() == TokenType::KW_RETURN) {
+    if (Lexer->getCurToken() == TokenType::KW_RETURN) {
         stmt = parseReturn();
         return stmt;
     }
     // EXPR ::= NUMBER BINOP*
     // EXPR ::= IDENT (CALL/ASSIGN/EXPR)
     // ANYTHING ::= EXPR (basically last resort, e.g. starting with '(')
-    else if (Lexer->getCurToken() == TokenType::NUMBER
-            || Lexer->getCurToken() == TokenType::IDENTIFIER
-            || Lexer->getCurToken() == TokenType::KW_LEFTBRACKET) {
+    if (Lexer->getCurToken() == TokenType::NUMBER
+        || Lexer->getCurToken() == TokenType::IDENTIFIER
+        || Lexer->getCurToken() == TokenType::KW_LEFTBRACKET) {
         auto expr = parseExpression();
         stmt = std::make_unique<ASTStatementExpr>(std::move(expr));
     }

@@ -18,7 +18,7 @@ public:
         return Name;
     }
 
-    const std::vector<std::unique_ptr<ASTArgument>> * getArgs(void) {
+    const std::vector<std::unique_ptr<ASTArgument>>* getArgs(void) {
         return &Args;
     }
 

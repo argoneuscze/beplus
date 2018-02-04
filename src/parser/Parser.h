@@ -82,7 +82,7 @@ public:
     std::unique_ptr<Module> parse();
 
 private:
-    bool functionBuiltin(const std::string & name);
+    bool functionBuiltin(const std::string& name);
     void handleTopLevelStatement();
     void handleFunction();
 
@@ -91,10 +91,10 @@ private:
 
     std::unique_ptr<ASTExpression> parseExpression();
     std::unique_ptr<ASTExpression> parsePrimary();
-    std::unique_ptr<ASTExpression> parseAssignment(std::unique_ptr<ASTIdentVariable> & astIdent);
+    std::unique_ptr<ASTExpression> parseAssignment(std::unique_ptr<ASTIdentVariable>& astIdent);
     std::unique_ptr<ASTExpression> parseBinOpRHS(int prec, std::unique_ptr<ASTExpression> LHS);
     std::unique_ptr<ASTExpressionBool> parseBoolExpression(void);
-    std::unique_ptr<ASTExpression> parseCall(const std::string & ident);
+    std::unique_ptr<ASTExpression> parseCall(const std::string& ident);
     std::unique_ptr<ASTExpression> parseIdentExpression(void);
     std::unique_ptr<ASTExpressionNumber> parseNumberExpression();
     std::unique_ptr<ASTExpressionVariable> parseVariableExpression(void);
