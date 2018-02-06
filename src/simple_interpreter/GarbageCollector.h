@@ -10,12 +10,12 @@ public:
     }
 
     void collect(std::list<std::shared_ptr<ValueStruct>>& memory) const {
-        std::cout << "[GC] Mark & Sweep started" << std::endl;
+        std::cout << "[GC] Mark & Sweep started, allocated: " << memory.size() << std::endl;
 
         mark();
         sweep(memory);
 
-        std::cout << "[GC] Mark & Sweep finished" << std::endl;
+        std::cout << "[GC] Mark & Sweep finished, allocated: " << memory.size() << std::endl;
     }
 
 private:

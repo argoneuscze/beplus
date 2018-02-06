@@ -1,0 +1,43 @@
+struct gcStruct
+{
+  int first;
+  int second;
+}
+
+def makeStruct(): void
+{
+  struct gcStruct strct;
+  strct.first = 1;
+  strct.second = 2;
+}
+
+def main(): int
+{
+  int i;
+
+  struct gcStruct anotherStruct;
+
+  # put something in, should work
+  anotherStruct.first = 3;
+  anotherStruct.second = 4;
+
+  print(anotherStruct.first);
+  print(anotherStruct.second);
+
+  # this loop will run GC (because memory size will exceed 10)
+  for(i = 0; i <= 10; i+=1)
+  {
+    makeStruct();
+  }
+
+  # put something else in, should still be valid
+  anotherStruct.first = 5;
+  anotherStruct.second = 6;
+
+  print(anotherStruct.first);
+  print(anotherStruct.second);
+
+  return 0;
+}
+
+main();
