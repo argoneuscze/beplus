@@ -1,10 +1,11 @@
-# Beplus
+# beplus
 
-This is an interpreter in development, most features do not work as of yet.
+beplus a simple interpreter for a statically typed C-like language. The language supports dynamic
+allocation and also has a simple mark-and-sweep based garbage collector.
 
 ## Installation
 
-The project is packaged using CMake, so it should be compilable on every major platform.
+beplus is written in C++ and packaged using CMake, so it should be easily compilable on every major platform.
 
 ### Linux
 
@@ -17,8 +18,16 @@ The project is packaged using CMake, so it should be compilable on every major p
 ## Usage
 
 You may either run the interpreter in REPL mode, or you can supply a filename as an argument.
-This file will then be parsed and ran with the interpreter.
+This file will then be parsed and ran with the interpreter. The authors are as following:
+
+* **Marek Pikna** @ <mar.pikna@gmail.com>
+* **Tomáš Drbota** @ <argoneuscze@gmail.com>
+
+## Notes
+
+This interpreter was submitted as a semestral project for the course MI-RUN (Runtime Systems)
+at FIT CTU in Prague.
 
 ## License
 
-TBA
+This program is licensed under the [MIT License](LICENSE.md).
