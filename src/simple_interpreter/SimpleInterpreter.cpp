@@ -132,7 +132,8 @@ void SimpleInterpreter::visit(ASTExpressionCall* call) {
         throw InterpreterException(err);
     }
 
-    CurEnv = GlobalEnv->fork();
+    auto funcEnv = GlobalEnv->fork();
+    auto prevEnv = CurEnv;
 
     // TODO resolve args + var names, push them into env
     // TODO check datatypes
@@ -146,13 +147,19 @@ void SimpleInterpreter::visit(ASTExpressionCall* call) {
         auto name = (*argsPrototype)[i]->getName();
         (*argsCall)[i]->accept(this);
 
-        if (!CurEnv->initVariable(name, CurValue))
+        if (!funcEnv->initVariable(name, CurValue))
             throw InterpreterException("Could not initialize a variable in the new environment.");
     }
+    
+    CurEnv = funcEnv;
 
     func->second->getBlock()->accept(this);
 
-    CurEnv = CurEnv->restorePrev();
+    // destroy the environment
+    CurEnv->restorePrev();
+
+    // restore the previous one before the call
+    CurEnv = prevEnv;
 }
 
 void SimpleInterpreter::visit(ASTExpressionCallBuiltin* call) {
