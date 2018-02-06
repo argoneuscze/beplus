@@ -3,9 +3,12 @@ def main(): int
   int in;
   readInput(in);
 
-  int multiplier = 5;
+  int multiplier;
+  multiplier = 5;
 
-  print(multiplier * res);
+  print(multiplier * in);
 
   return 0;
 }
+
+main();

@@ -1,8 +1,0 @@
-def main(): int
-{
-  const int x = 10;
-
-  x += 20; # throw exception
-
-  return 0;
-}
