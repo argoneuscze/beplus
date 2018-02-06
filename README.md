@@ -20,8 +20,8 @@ beplus is written in C++ and packaged using CMake, so it should be easily compil
 You may either run the interpreter in REPL mode, or you can supply a filename as an argument.
 This file will then be parsed and ran with the interpreter. The authors are as following:
 
-* **Marek Pikna** @ <mar.pikna@gmail.com>
-* **Tomáš Drbota** @ <argoneuscze@gmail.com>
+* **Marek Pikna** <<mar.pikna@gmail.com>>
+* **Tomáš Drbota** <<argoneuscze@gmail.com>>
 
 ## Notes
 
